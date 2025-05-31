@@ -84,16 +84,14 @@
                 const result = await response.json();
 
                 if (!response.ok) {
-                    // Mesmo que o backend retorne 200 para email não encontrado,
-                    // um erro 500 real ainda pode acontecer.
+                    
                     throw new Error(result.error || 'Falha ao solicitar redefinição.');
                 }
                 
                 feedbackEl.className = 'form-feedback success';
-                feedbackEl.textContent = result.message; // Ex: "Se um usuário... link foi enviado."
+                feedbackEl.textContent = result.message; 
                 
-                // Não redirecionar, apenas mostrar a mensagem.
-                // O usuário deve checar o email (ou o console do backend, no nosso caso).
+              
                 document.getElementById('requestResetForm').reset();
 
 

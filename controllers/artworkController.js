@@ -22,21 +22,11 @@ exports.createArtwork = async (req, res, next) => {
 
     let imageURL = null; // Default para null se nenhuma imagem for enviada
     if (req.file) {
-        // Construímos a URL para acessar a imagem.
-        // A pasta 'public/uploads/artworks' é servida como '/uploads/artworks'
-        // devido ao app.use(express.static(path.join(__dirname, 'public'))); no server.js
-        // e à configuração do multer.
+       
         imageURL = `/uploads/artworks/${req.file.filename}`;
     } else {
-        // Se o design do Figma IMPLICA uma imagem mas o backend pode aceitar sem,
-        // você pode querer retornar um erro se req.file não existir.
-        // Ou, se a imagem for opcional ou puder ser uma URL externa ainda:
-        // imageURL = req.body.ImageURL_externa || null; // Se você tiver um campo para URL externa
-        // Por agora, se não houver upload, imageURL será null ou o que vier do corpo (se houver).
-        // Para o design com upload, é provável que uma imagem seja esperada.
-        // Vamos manter assim, mas o ideal é que o frontend envie o arquivo.
-        // Se o campo ImageURL do seu HTML for preenchido quando não há upload, ele virá em req.body.ImageURL
-        if (req.body.ImageURL) { // Se o usuário colou uma URL em vez de fazer upload
+   
+        if (req.body.ImageURL) { 
             imageURL = req.body.ImageURL;
         }
     }

@@ -1,4 +1,4 @@
-// art-gallery-backend-novo/routes/artistRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const artistController = require('../controllers/artistController');

@@ -1,4 +1,4 @@
-// art-gallery-backend-novo/middleware/errorHandler.js
+
 
 const notFound = (req, res, next) => {
     res.status(404).json({ error: 'Oops! Rota não encontrada.' });

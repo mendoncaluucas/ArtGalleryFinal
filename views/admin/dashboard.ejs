@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Ajustes rápidos para o dashboard, idealmente mova para seu CSS */
+    
     .dashboard { padding: 20px; }
     .dashboard h3 { font-size: 1.5em; margin-bottom: 20px; color: #333; }
     .cards { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; }
@@ -98,7 +98,7 @@
   </div>
 
   <script>
-    // Gráfico de linha (dados fixos como no seu HTML)
+   
     const ctxLine = document.getElementById('lineChart')?.getContext('2d');
     if (ctxLine) {
       new Chart(ctxLine, {
@@ -108,7 +108,7 @@
           datasets: [
             {
               label: 'Mês Atual',
-              data: [10, 20, 15, 25, 20, 30, 35], // Dados fictícios
+              data: [10, 20, 15, 25, 20, 30, 35],
               borderColor: '#A3C4FF',
               tension: 0.4,
               fill: false,
@@ -116,7 +116,7 @@
             },
             {
               label: 'Mês Anterior',
-              data: [20, 15, 18, 22, 27, 30, 30], // Dados fictícios
+              data: [20, 15, 18, 22, 27, 30, 30], 
               borderColor: '#000',
               borderDash: [5, 5],
               tension: 0.4,
@@ -129,7 +129,7 @@
       });
     }
 
-    // Gráfico de Rosca (dados fixos como no seu HTML)
+    
     const ctxDoughnut = document.getElementById('doughnutChart')?.getContext('2d');
     if (ctxDoughnut) {
       new Chart(ctxDoughnut, {
@@ -138,7 +138,7 @@
           labels: ['Estados Unidos', 'Brasil', 'Canadá', 'Outros'],
           datasets: [{
             label: 'Acessos',
-            data: [36.6, 22.5, 30.8, 8.1], // Dados fictícios
+            data: [36.6, 22.5, 30.8, 8.1], 
             backgroundColor: ['#A3C4FF', '#B2F2BB', '#D0BFFF', '#CED4DA'],
             borderWidth: 1
           }]

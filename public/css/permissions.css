@@ -8,7 +8,7 @@ body.permissions-page-body {
     margin: 0;
 }
 
-/* Estilo placeholder para o header - idealmente, você teria um CSS de layout global */
+
 .permissions-header-placeholder {
     background-color: #FFFFFF; 
     color: var(--primary-text);
@@ -16,12 +16,11 @@ body.permissions-page-body {
     display: flex;
     align-items: center;
     border-bottom: 1px solid #E5E8EB; /* Cor da borda do Figma */
-    /* Você precisará adicionar o resto dos estilos do seu menu global aqui */
+    
 }
 .permissions-header-placeholder .logo-placeholder img { 
     height: 24px; /* Altura do logo no header do Figma */
 }
-/* Adapte as classes .nav-links e .perfil-container para baterem com seu header global */
 
 
 .permissions-page-container {
@@ -29,7 +28,7 @@ body.permissions-page-body {
     flex-wrap: wrap;
     gap: 24px;
     padding: 24px; /* Padding geral do container da página */
-    max-width: 1200px; /* Ajuste conforme necessidade */
+    max-width: 1200px; 
     margin: 0 auto; /* Centraliza */
 }
 
@@ -273,7 +272,7 @@ body.permissions-page-body {
 }
 
 /* Responsividade */
-@media (max-width: 960px) { /* Ajuste o breakpoint conforme necessário */
+@media (max-width: 960px) { 
     .permissions-page-container {
         flex-direction: column;
     }

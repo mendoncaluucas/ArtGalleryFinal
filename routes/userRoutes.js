@@ -22,14 +22,7 @@ router.get('/', protect, isAdmin, userController.getAllUsers);
 // PUT /api/users/:userId/admin
 router.put('/:userId/admin', protect, isAdmin, userController.updateUserAdminStatus);
 
-// Adicionar aqui a rota para deletar usuário se necessário (ex: DELETE /api/users/:userId)
-// router.delete('/:userId', protect, isAdmin, userController.deleteUser); 
-// (Lembre-se de criar a função deleteUser no userController se for usar)
 
-// Rota da API para buscar usuários por nome (somente admins, retorna JSON)
-// GET /api/users/search?name=TEXTO
-// (Esta rota precisa da função searchUsersByName no userController.js)
-// router.get('/search', protect, isAdmin, userController.searchUsersByName);
 
 
 module.exports = router;

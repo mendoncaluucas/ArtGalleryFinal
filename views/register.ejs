@@ -130,7 +130,7 @@
                 messageEl.style.color = 'green';
                 messageEl.textContent = result.message + ' Você será redirecionado para o login...';
                 setTimeout(() => {
-                    window.location.href = '/login'; // Rota da sua página de login EJS
+                    window.location.href = '/login'; 
                 }, 2500);
             } catch (error) {
                 console.error('Erro ao registrar:', error);
@@ -139,6 +139,5 @@
             }
         });
 
-        // Ajuste para o link "Faça login" se o seletor original não funcionar
-        // O seletor original era '.text-wrapper-5' dentro de '.voc-j-possui-conta'
+      
         const loginLinkElement = document.querySelector

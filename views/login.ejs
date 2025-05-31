@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/globals.css" />
     <link rel="stylesheet" href="/css/styleguide.css" />
     <link rel="stylesheet" href="/css/login.css" /> <title><%= pageTitle %></title>
-    <style> /* Adicione estilos para a mensagem de erro/sucesso se não estiver no seu CSS */
+    <style> 
         .form-message { text-align: center; margin-top: 15px; font-weight: bold; }
         .form-message.success { color: green; }
         .form-message.error { color: red; }
@@ -95,14 +95,11 @@
                     throw new Error(result.error || 'Falha no login. Verifique suas credenciais.');
                 }
                 
-                // O cookie JWT já foi configurado pelo servidor na resposta.
-                // Agora podemos redirecionar.
+               
                 if (result.user && result.user.isAdmin) {
                     window.location.href = '/admin/permissions'; 
                 } else {
-                    // Se você tiver uma página de dashboard para usuários comuns:
-                    // window.location.href = '/dashboard'; 
-                    // Por enquanto, redireciona para a página de cadastro de obras ou home
+                    
                     window.location.href = '/artworks/new'; 
                 }
             } catch (error) {

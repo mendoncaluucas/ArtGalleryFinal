@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/css/globals.css">   <link rel="stylesheet" href="/css/styleguide.css"> <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style>
-    /* Estilos rápidos. Mova para seu CSS externo. */
+    
     body { font-family: sans-serif; }
     .main-content-area { padding: 20px; max-width: 1400px; margin: 0 auto;} /* Adicionado para conter o conteúdo */
     .top-buttons button { margin-right: 10px; padding: 8px 15px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 4px; }
@@ -121,7 +121,7 @@
 <script>
   let currentDataType = '<%= initialDataType %>'; // 'artworks', 'artists', ou 'users'
   let currentItemIdToDelete = null;
-  const adminToken = localStorage.getItem('adminAuthToken'); // Assumindo que o token de admin está aqui
+  const adminToken = localStorage.getItem('adminAuthToken'); 
 
   const tableHead = document.getElementById('tableHead');
   const tableBody = document.getElementById('tableBody');
@@ -300,7 +300,7 @@
   // Carregar dados iniciais e configurar ouvintes
   document.addEventListener('DOMContentLoaded', () => {
       updateTableHeaders('<%= initialDataType %>');
-      // Os dados iniciais já estão renderizados pelo EJS, então só precisamos anexar os listeners
+      
       attachActionListeners();
       if (tabButtons['<%= initialDataType %>']) {
           tabButtons['<%= initialDataType %>'].classList.add('selected');
@@ -312,7 +312,7 @@
   <% if (user) { %>
     const logoutButtonManage = document.getElementById('logoutButtonEJS');
     if(logoutButtonManage) {
-        logoutButtonManage.addEventListener('click', async function() { /* ... (código de logout igual ao do index.ejs) ... */ });
+        logoutButtonManage.addEventListener('click', async function() { });
     }
   <% } %>
 

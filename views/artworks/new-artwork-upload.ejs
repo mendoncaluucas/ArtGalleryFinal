@@ -35,11 +35,11 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ...></script>
     <script>
-        // SEU CÓDIGO JAVASCRIPT EXISTENTE PARA DRAG & DROP E MODAL
+      
         const dropArea = document.getElementById('drop-area');
-        const fileInput = document.getElementById('fileInput'); // Este é o input type="file"
+        const fileInput = document.getElementById('fileInput'); 
         const modal = document.getElementById('modal');
-        // const submitBtn = document.getElementById('submitBtn'); // Este botão agora será o submit do formulário
+      
 
         if(dropArea) {
             dropArea.addEventListener('dragover', (e) => {
@@ -81,7 +81,7 @@
         if (artworkForm) {
             artworkForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
-                const token = localStorage.getItem('userAuthToken'); // Ou a chave que você usa para usuários logados
+                const token = localStorage.getItem('userAuthToken'); 
                 
                 if (!token) {
                     alert('Autenticação necessária para enviar a obra.');
@@ -91,19 +91,19 @@
 
                 const formData = new FormData();
                 
-                // Pegue os valores dos seus inputs pelos IDs corretos
+              
                 formData.append('Title', document.getElementById('titulo').value);
                 formData.append('Description', document.getElementById('descricao').value);
                 formData.append('CreationYear', document.getElementById('ano').value);
                 
-                // ADICIONE OS OUTROS CAMPOS QUE VOCÊ COLOCAR NO FORMULÁRIO EJS
-                const artistIdElement = document.getElementById('artistIdSelect'); // Exemplo
+                
+                const artistIdElement = document.getElementById('artistIdSelect'); 
                 if (artistIdElement) formData.append('ArtistID', artistIdElement.value);
                 
-                const mediumElement = document.getElementById('mediumInput'); // Exemplo
+                const mediumElement = document.getElementById('mediumInput');
                 if (mediumElement) formData.append('Medium', mediumElement.value);
 
-                const dimensionsElement = document.getElementById('dimensionsInput'); // Exemplo
+                const dimensionsElement = document.getElementById('dimensionsInput'); 
                 if (dimensionsElement) formData.append('Dimensions', dimensionsElement.value);
 
 
@@ -111,9 +111,7 @@
                 if (fileInput.files.length > 0) {
                     formData.append('artworkImage', fileInput.files[0]); // 'artworkImage' é o nome do campo esperado pelo multer
                 } else {
-                    // Decida o que fazer se nenhuma imagem for selecionada.
-                    // O backend pode aceitar uma ImageURL manual se você tiver esse campo,
-                    // ou você pode tornar a imagem obrigatória aqui no frontend.
+                    
                     alert('Por favor, selecione um arquivo de imagem para a obra.');
                     return; 
                 }
@@ -122,7 +120,7 @@
                     const response = await fetch('/api/artworks', {
                         method: 'POST',
                         headers: {
-                            // NÃO defina 'Content-Type' aqui para FormData com arquivos!
+                            
                             'Authorization': `Bearer ${token}`
                         },
                         body: formData 
@@ -133,8 +131,8 @@
                         throw new Error(result.error || 'Falha ao enviar obra.');
                     }
                     
-                    // alert(result.message); // O modal substitui o alert
-                    if(modal) modal.style.display = 'flex'; // Mostra seu modal de sucesso
+                    
+                    if(modal) modal.style.display = 'flex'; 
                     artworkForm.reset(); // Limpa o formulário
 
                 } catch (error) {

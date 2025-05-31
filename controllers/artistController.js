@@ -65,11 +65,7 @@ exports.updateArtist = async (req, res, next) => {
     const { Name, Biography, Nationality, BirthYear, DeceasedYear } = req.body;
 
     if (!Name) {
-        // Em uma atualização, você pode querer permitir atualizações parciais,
-        // mas para este exemplo, vamos manter o nome como obrigatório se fornecido para atualização.
-        // Se o nome não estiver no corpo, ele não será atualizado.
-        // No entanto, se o nome for uma string vazia, isso pode ser um problema.
-        // Uma validação mais robusta seria necessária para um cenário real.
+        
     }
 
     // Monta um objeto apenas com os campos que foram fornecidos para atualização
@@ -113,9 +109,7 @@ exports.updateArtist = async (req, res, next) => {
 exports.deleteArtist = async (req, res, next) => {
     const { id } = req.params;
     try {
-        // Opcional: verificar se existem obras de arte associadas a este artista
-        // e decidir o que fazer (impedir exclusão, excluir obras, desassociar obras).
-        // A FK na tabela Artworks está como ON DELETE SET NULL, então as obras ficarão sem artista.
+        
 
         const [result] = await db.query('DELETE FROM Artists WHERE ArtistID = ?', [id]);
 

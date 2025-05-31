@@ -53,9 +53,7 @@ exports.updateUserAdminStatus = async (req, res, next) => {
     if (Number(req.user.userId) === Number(userId) && !isAdmin) {
          return res.status(400).json({ error: 'Um administrador não pode remover seus próprios privilégios de administrador.' });
     }
-    // Ou, se você quiser permitir, remova o if acima.
-    // No entanto, é mais seguro impedir que o último admin se despromova,
-    // mas essa lógica seria mais complexa (contar quantos admins existem).
+   
 
     try {
         const [result] = await db.query('UPDATE Users SET IsAdmin = ? WHERE UserID = ?', [isAdmin, userId]);

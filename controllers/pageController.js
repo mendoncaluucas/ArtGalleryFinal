@@ -1,4 +1,4 @@
-// art-gallery-backend-novo/controllers/pageController.js
+
 const db = require('../config/db');
 const jwt = require('jsonwebtoken'); // Necessário para getLoggedInUser
 require('dotenv').config();
@@ -62,7 +62,7 @@ exports.renderHomePage = async (req, res, next) => {
             user: loggedInUser,
             carouselArtworks: carouselArtworks,
             featuredArtists: artistsForCarousel,
-            gridArtworks: generalArtworks, // <--- CORREÇÃO: Mude 'artworks' para 'gridArtworks'
+            gridArtworks: generalArtworks, 
             currentPath: '/'
         });
     } catch (error) {
@@ -355,7 +355,7 @@ exports.renderManagementPage = async (req, res, next) => {
     try {
         const loggedInUser = getLoggedInUser(req);
 
-        // Para a aba inicial "Encontrar obras" (pode ser ajustado para ser dinâmico)
+        
         const queryArtworks = `
             SELECT 
                 aw.ArtworkID, aw.Title, aw.CreationYear, aw.status,
@@ -405,11 +405,11 @@ exports.renderArtworkDetailPagePublic = async (req, res, next) => {
             ArtistID: artwork.ArtistObjID,
             Name: artwork.ArtistName,
             Biography: artwork.ArtistBiography, // Pode ser a biografia completa aqui
-            // Para imagem do artista, podemos usar a mesma lógica de placeholder ou buscar uma obra dele
-            mainImage: '/img/placeholder-artist.png' // Placeholder, ou lógica mais complexa
+
+            mainImage: '/img/placeholder-artist.png' 
         } : null;
 
-        // Se tivermos um artista, buscar uma imagem dele (ex: sua primeira obra)
+        
         if (artistOfArtwork) {
             const [artistArtworks] = await db.query(
                 "SELECT ImageURL FROM Artworks WHERE ArtistID = ? AND status = 'approved' AND ImageURL IS NOT NULL AND ImageURL != '' LIMIT 1",
@@ -420,8 +420,7 @@ exports.renderArtworkDetailPagePublic = async (req, res, next) => {
             }
         }
         
-        // 2. Buscar Obras Similares (ex: outras obras do mesmo artista, ou aleatórias)
-        // Por simplicidade, vamos pegar outras obras aprovadas, excluindo a atual.
+        
         let similarArtworks = [];
         if (artwork.ArtistID) { // Se a obra tem um artista, pega outras dele
             const [similarsFromArtist] = await db.query(
@@ -445,15 +444,14 @@ exports.renderArtworkDetailPagePublic = async (req, res, next) => {
         }
 
 
-        // 3. Comentários (Placeholder por enquanto)
+       
         const comments = [
             // { UserName: 'Lana Miranda', Text: 'Ficou lindo💕', AvatarURL: '/img/usuario.jpg' } // Exemplo
         ];
 
-        // 4. Status de favorito (Placeholder por enquanto)
+        
         let isFavorited = false;
         if (loggedInUser) {
-            // Aqui você faria uma query para verificar se loggedInUser.userId favoritou artwork.ArtworkID
             // const [favs] = await db.query("SELECT FavoriteID FROM UserFavorites WHERE UserID = ? AND ArtworkID = ?", [loggedInUser.userId, artwork.ArtworkID]);
             // isFavorited = favs.length > 0;
         }
@@ -483,10 +481,7 @@ exports.renderUserProfilePage = async (req, res, next) => {
             return res.redirect('/login?message=Você precisa estar logado para ver seu perfil.');
         }
 
-        // Buscar os dados mais recentes do usuário para o formulário
-        // A rota /api/users/profile ou /api/auth/me pode ser chamada aqui internamente
-        // ou podemos pegar de req.user e, se precisar de mais, buscar no banco.
-        // Por simplicidade, usaremos req.user, mas a API /api/users/profile seria mais robusta para dados frescos.
+        
         const [users] = await db.query('SELECT UserID, Name, Email FROM Users WHERE UserID = ?', [loggedInUser.userId]);
         if (users.length === 0) {
             // Isso não deveria acontecer se o token é válido

@@ -1,4 +1,4 @@
-// art-gallery-backend-novo/middleware/authMiddleware.js
+
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -26,9 +26,7 @@ const protect = async (req, res, next) => {
 
     if (!token) {
         if (isHtmlRequest) {
-            // Para páginas EJS, redirecionar para uma página de login EJS
-            // Se não tiver uma, pode enviar um HTML de erro simples.
-            // Assumindo que você tem uma rota GET /login que renderiza login.ejs
+           
             return res.redirect('/login?message=Por favor, faça login para continuar.');
         }
         return res.status(401).json({ error: 'Não autorizado. Nenhum token fornecido.' });

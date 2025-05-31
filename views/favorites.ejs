@@ -148,12 +148,12 @@
         // Script de Logout
         const logoutButtonFavorites = document.getElementById('logoutButtonEJS');
         if(logoutButtonFavorites) {
-            logoutButtonFavorites.addEventListener('click', async function() { /* ... (código de logout igual ao do index.ejs) ... */ });
+            logoutButtonFavorites.addEventListener('click', async function() { });
         }
 
         // Script para Desfavoritar
         async function unfavoriteArtwork(artworkId, buttonElement) {
-            const userToken = localStorage.getItem('userAuthToken'); // Ou a chave correta do seu token
+            const userToken = localStorage.getItem('userAuthToken'); 
             if (!userToken) {
                 alert('Você precisa estar logado para remover dos favoritos.');
                 // window.location.href = '/login'; // Opcional: redirecionar
@@ -178,7 +178,6 @@
                 }
                 alert(result.message);
                 // Remover o item da UI ou recarregar a página
-                // Para remover da UI sem recarregar (mais avançado):
                 // buttonElement.closest('.container-amostras').remove();
                 window.location.reload(); // Simplesmente recarrega
             } catch (error) {

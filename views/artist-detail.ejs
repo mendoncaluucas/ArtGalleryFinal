@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <style>
     /* Estilos adicionais ou ajustes rápidos podem ir aqui ou no homepage.css */
-    .logout-button-style { /* Estilo para o botão de logout, se não definido em homepage.css */
+    .logout-button-style {
         background: none; 
         border: none; 
-        color: #fff; /* Ou a cor do texto do seu menu */
+        color: #fff; 
         cursor: pointer; 
         padding: 0; 
         margin-left: 10px; 
@@ -37,7 +37,7 @@
     .botao-seguir.seguindo { /* Classe para o botão quando estiver "Seguindo" */
       background-color: #28a745; /* Exemplo de cor verde */
       color: white;
-      /* Outros estilos que você definiu para 'seguindo' */
+      
     }
     .botao-seguir svg { /* Estilo para o SVG dentro do botão 'Seguindo' */
       margin-right: 5px;
@@ -148,9 +148,7 @@
         const biografiaP = conteudoDiv.querySelector('.biografia-p');
         if (!biografiaP) return;
 
-        // Verifica se o texto é maior que a altura definida para o "blur"
-        // A altura de 'blur' é 6em. Precisamos de uma forma de medir isso.
-        // Uma aproximação: se o scrollHeight for maior que uma altura X (ex: 100px)
+       
         const alturaMaximaInicial = 6 * parseFloat(getComputedStyle(biografiaP).lineHeight); // Aproximadamente 6 linhas
         
         if (biografiaP.scrollHeight > alturaMaximaInicial + 20) { // Adiciona uma margem de tolerância

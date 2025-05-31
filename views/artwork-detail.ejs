@@ -145,12 +145,11 @@
 
     <script>
        function alternarSeguir(botao) {
-            // ... (sua função alternarSeguir existente) ...
-            // Adicionar chamada API para seguir/deixar de seguir artista aqui no futuro
+           
        }
 
        async function toggleFavorite(artworkId) {
-            const userToken = localStorage.getItem('userAuthToken'); // Ou a chave que você usa
+            const userToken = localStorage.getItem('userAuthToken'); 
             if (!userToken) {
                 alert('Você precisa estar logado para favoritar obras.');
                 // window.location.href = '/login'; // Opcional
@@ -158,9 +157,7 @@
             }
 
             const heartIcon = document.getElementById(`favoriteIcon_${artworkId}`);
-            // Determinar se estamos favoritando ou desfavoritando pela classe do ícone
-            // (Você precisaria de uma lógica para saber o estado inicial ao carregar a página)
-            // Por agora, vamos assumir que se não tiver a classe 'favorited', vamos tentar favoritar.
+          
             let isCurrentlyFavorited = heartIcon ? heartIcon.classList.contains('fa-solid') : false; // Simplificação
             
             const method = isCurrentlyFavorited ? 'DELETE' : 'POST';
@@ -196,7 +193,7 @@
         <% if (user) { %>
             const logoutBtnDetail = document.getElementById('logoutButtonEJS');
             if(logoutBtnDetail) {
-                logoutBtnDetail.addEventListener('click', async function() { /* ... (código de logout igual ao do index.ejs) ... */ });
+                logoutBtnDetail.addEventListener('click', async function() {  });
             }
         <% } %>
     </script>
