@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/css/globals.css" />
+    <link rel="stylesheet" href="/css/styleguide.css" />
+    <link rel="stylesheet" href="/css/redefinir3.css" /> <title><%= pageTitle %></title>
+    <style> /* Para mensagens de feedback */
+        .form-feedback { text-align: center; margin-top: 15px; font-weight: bold; }
+        .form-feedback.success { color: green; }
+        .form-feedback.error { color: red; }
+    </style>
+  </head>
+  <body>
+    <div class="redefinir-senha"> <div class="div">
+        <img class="image" src="/img/image5.png" alt="Background" /> <img class="unnamed" src="/img/unnamed.png" alt="Logo" />
+        <div class="login-form"> <div class="intro">
+            <div class="text-wrapper">ART GALLERY</div>
+            <p class="p">Onde a arte encontra seu lugar.</p>
+            <h2 style="font-size: 24px; margin-top: 10px; color: var(--primary-text);">Verificar Código</h2>
+          </div>
+
+          <form id="verifyTokenForm" class="form">
+            <% if (error) { %><p class="form-feedback error"><%= error %></p><% } %>
+            <% if (message) { %><p class="form-feedback success"><%= message %></p><% } %>
+
+            <div class="input"> <div class="input-2"> <div class="input-3"> <input id="resetTokenInput" name="token" class="input-3" placeholder="Insira o código recebido" type="text" required />
+                </div>
+              </div>
+            </div>
+            
+            <p class="text-wrapper-2" style="font-size: 14px; color: var(--secondary-text);">
+                Um código de liberação foi enviado para seu e-mail.
+            </p>
+            <button type="submit" class="main-button">
+                <div class="sign-in">Verificar Código</div>
+            </button>
+          </form>
+          <p id="formFeedbackMessageClient" class="form-feedback"></p>
+
+          <div class="social-sign-in" style="margin-top: 20px;"> <div class="or">
+              <img class="line" src="/img/line-2.svg" alt="Line" />
+              <div class="text-wrapper-3">Ou</div>
+              <img class="line" src="/img/line-1.svg" alt="Line" />
+            </div>
+            <div class="social-buttons">
+              <div class="social-button">
+                <img class="img" src="/img/google.png" alt="Google" />
+                <div class="sign-in-with">Entrar com o Google</div>
+              </div>
+              <div class="social-button">
+                <img class="img" src="/img/facebook.png" alt="Facebook" />
+                <div class="sign-in-with-2">Entrar com o Facebook</div>
+              </div>
+            </div>
+          </div>
+          <p class="voc-n-o-possui-conta" style="margin-top: 20px;"> <span class="span">Você não possui conta? </span> 
+            <a href="/register" class="text-wrapper-4">Cadastre-se</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        document.getElementById('verifyTokenForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const feedbackEl = document.getElementById('formFeedbackMessageClient');
+            feedbackEl.textContent = ''; 
+
+            const submittedToken = document.getElementById('resetTokenInput').value;
+            const data = { token: submittedToken };
+
+            try {
+                feedbackEl.textContent = 'Verificando código...';
+                feedbackEl.className = 'form-feedback';
+
+                const response = await fetch('/api/auth/verify-reset-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Falha ao verificar o código.');
+                }
+                
+                // Código verificado com sucesso! Redirecionar para a página de definir nova senha,
+                // passando o token original (verificado) como query parameter.
+                // A API /api/auth/verify-reset-token retorna o `resetToken` original no sucesso.
+                window.location.href = `/set-new-password-page?token=${result.resetToken}`;
+
+            } catch (error) {
+                console.error('Erro ao verificar código:', error);
+                feedbackEl.className = 'form-feedback error';
+                feedbackEl.textContent = 'Erro: ' + error.message;
+            }
+        });
+    </script>
+  </body>
+</html>

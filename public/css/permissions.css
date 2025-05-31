@@ -1,0 +1,285 @@
+/* public/css/permissions.css */
+
+/* Aplica a fonte base do seu styleguide ao corpo desta página específica se não estiver global */
+body.permissions-page-body {
+    font-family: var(--www-figma-com-inter-regular-font-family, sans-serif); /* Usa variável de fonte */
+    background-color: #F7F8FA; /* Fundo cinza claro como no Figma */
+    color: var(--primary-text); /* Usa variável de cor */
+    margin: 0;
+}
+
+/* Estilo placeholder para o header - idealmente, você teria um CSS de layout global */
+.permissions-header-placeholder {
+    background-color: #FFFFFF; 
+    color: var(--primary-text);
+    padding: 15px 24px; /* Padding do Figma para o header da página de permissões */
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #E5E8EB; /* Cor da borda do Figma */
+    /* Você precisará adicionar o resto dos estilos do seu menu global aqui */
+}
+.permissions-header-placeholder .logo-placeholder img { 
+    height: 24px; /* Altura do logo no header do Figma */
+}
+/* Adapte as classes .nav-links e .perfil-container para baterem com seu header global */
+
+
+.permissions-page-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 24px; /* Padding geral do container da página */
+    max-width: 1200px; /* Ajuste conforme necessidade */
+    margin: 0 auto; /* Centraliza */
+}
+
+.permissions-main-content {
+    flex: 1;
+    min-width: 0; /* Permite que o flex item encolha */
+    background-color: #FFFFFF;
+    padding: 32px; /* Padding interno do Figma */
+    border-radius: 12px; /* Raio do Figma */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04); /* Sombra sutil do Figma */
+}
+
+.page-header h1 {
+    font-family: var(--www-figma-com-inter-semi-bold-font-family, sans-serif); /* Fonte do Figma */
+    font-weight: var(--www-figma-com-inter-semi-bold-font-weight, 600);
+    font-size: 24px; 
+    color: var(--primary-text);
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+.page-header .subtitle {
+    font-family: var(--www-figma-com-inter-regular-font-family, sans-serif);
+    font-size: 14px;
+    color: var(--secondary-text); /* Variável para texto secundário */
+    margin-bottom: 32px;
+}
+
+.users-section h2 {
+    font-family: var(--www-figma-com-inter-medium-font-family, sans-serif); /* Fonte do Figma */
+    font-weight: var(--www-figma-com-inter-medium-font-weight, 500);
+    font-size: 18px; 
+    color: var(--primary-text);
+    margin-bottom: 20px;
+}
+
+.search-container {
+    margin-bottom: 24px;
+    position: relative; /* Para um possível ícone de busca dentro do input */
+}
+
+.search-bar {
+    width: 100%;
+    padding: 12px 16px; /* Padding do Figma */
+    /* padding-left: 40px; Se for adicionar ícone com ::before */
+    font-family: var(--www-figma-com-inter-regular-font-family, sans-serif);
+    font-size: 14px;
+    color: var(--primary-text);
+    background-color: #F7F8FA; /* Cor do Figma */
+    border: 1px solid #E5E8EB; /* Cor da borda do Figma */
+    border-radius: 8px; 
+    box-sizing: border-box;
+}
+.search-bar::placeholder {
+    color: var(--secondary-text);
+    opacity: 0.7;
+}
+
+.user-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espaço entre os cards de usuário */
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF; 
+    padding: 16px; /* Padding interno do card */
+    border-radius: 8px;
+    border: 1px solid #F0F1F3; /* Borda sutil do Figma */
+    transition: box-shadow 0.2s ease-in-out;
+}
+.user-item:hover {
+    box-shadow: 0px 3px 10px rgba(28, 42, 53, 0.07); /* Sombra ao passar o mouse */
+}
+
+.user-avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    background-color: #E5E8EB;
+    color: var(--secondary-text);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    font-family: var(--www-figma-com-inter-medium-font-family, sans-serif);
+    font-weight: var(--www-figma-com-inter-medium-font-weight, 500);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.user-info {
+    flex-grow: 1;
+}
+
+.user-name {
+    font-family: var(--www-figma-com-inter-medium-font-family, sans-serif);
+    font-weight: var(--www-figma-com-inter-medium-font-weight, 500);
+    font-size: 16px; 
+    color: var(--primary-text);
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-action.icon-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    font-weight: bold; /* Para tornar os ícones ✓ e ✕ mais visíveis */
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, opacity 0.2s, border-color 0.2s;
+    border: 1px solid transparent;
+}
+
+.icon-action.icon-admin-active { /* Check verde ativo (representa estado atual) */
+    background-color: #E4F5ED; 
+    color: #2ECC71; 
+    border-color: #A3E9C2;
+}
+.icon-action.icon-common-active { /* X vermelho ativo (representa estado atual) */
+    background-color: #FDEDED; 
+    color: #E74C3C;
+    border-color: #F5B7B1;
+}
+/* Ícone que representa a AÇÃO a ser tomada (o que está "desligado") */
+.icon-action.icon-action-inactive { 
+    background-color: #F0F1F3; 
+    color: #95A5A6; 
+    border-color: #E5E8EB;
+}
+.icon-action.icon-action-inactive:hover {
+    background-color: #DADEE3; /* Um pouco mais escuro no hover */
+    color: var(--primary-text);
+}
+/* Desabilitar hover no ícone que representa o estado atual, se for clicável apenas o inativo */
+.icon-admin-active[onclick=""], 
+.icon-common-active[onclick=""] {
+    cursor: default; /* Indica que não é clicável */
+    /* A opacidade será controlada pelo style inline no EJS para o usuário admin */
+}
+
+
+.permissions-sidebar-legend {
+    width: 100%; 
+    max-width: 280px;
+    flex-shrink: 0;
+}
+
+.legend-box {
+    background-color: #FFFFFF;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04);
+    position: relative;
+}
+
+.legend-box h2 {
+    font-family: var(--www-figma-com-inter-medium-font-family, sans-serif);
+    font-weight: var(--www-figma-com-inter-medium-font-weight, 500);
+    font-size: 16px; 
+    color: var(--primary-text);
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-family: var(--www-figma-com-inter-regular-font-family, sans-serif);
+    font-size: 14px;
+    color: var(--secondary-text);
+}
+
+.legend-icon { 
+    width: 24px; 
+    height: 24px;
+    border-radius: 50%; /* Circular como os ícones de ação */
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+}
+.legend-icon-admin {
+    background-color: #2ECC71; 
+}
+.legend-icon-common {
+    background-color: #E74C3C;
+}
+
+.admin-count {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #F0F1F3;
+    font-family: var(--www-figma-com-inter-regular-font-family, sans-serif);
+    font-size: 13px;
+    color: var(--secondary-text);
+    display: flex;
+    align-items: center;
+}
+.admin-avatars-placeholder { display: flex; margin-right: 8px; }
+.admin-avatars-placeholder span {
+    width: 24px; height: 24px; background-color: #E5E8EB; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: -8px; border: 2px solid #FFFFFF; color: var(--secondary-text); font-size: 10px;
+}
+.admin-avatars-placeholder span:first-child { margin-left: 0; }
+
+.add-new-button {
+    position: absolute;
+    top: 24px; 
+    right: 24px;
+    width: 32px; /* Um pouco menor como no Figma */
+    height: 32px;
+    background-color: #F7F8FA; /* Cor do Figma */
+    color: var(--secondary-text);
+    border: 1px solid #E5E8EB; 
+    border-radius: 6px; /* Raio do Figma */
+    font-size: 18px; /* '+' um pouco menor */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+.add-new-button:hover {
+    background-color: #e0e2e5;
+}
+
+/* Responsividade */
+@media (max-width: 960px) { /* Ajuste o breakpoint conforme necessário */
+    .permissions-page-container {
+        flex-direction: column;
+    }
+    .permissions-sidebar-legend {
+        width: 100%;
+        max-width: none;
+        margin-top: 24px;
+    }
+}

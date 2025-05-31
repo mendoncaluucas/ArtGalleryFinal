@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/styleguide.css">
+  <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Ajustes rápidos para o dashboard, idealmente mova para seu CSS */
+    .dashboard { padding: 20px; }
+    .dashboard h3 { font-size: 1.5em; margin-bottom: 20px; color: #333; }
+    .cards { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; }
+    .card { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; min-width: 200px; }
+    .card .cards-p { font-size: 0.9em; color: #777; margin-bottom: 5px; }
+    .card .container-visualizacoes { display: flex; align-items: baseline; justify-content: space-between; }
+    .card .container-h2 { font-size: 2em; font-weight: bold; color: #333; margin: 0; }
+    .card .container-visualizacoes p { font-size: 0.9em; margin: 0; }
+    .container-graficos { display: flex; flex-wrap: wrap; gap: 20px; }
+    .chart-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; min-width: 300px; }
+    .chart-container h3 { font-size: 1.2em; margin-bottom: 15px; text-align: center; }
+    .logout-button-style { background: none; border: none; color: #fff; cursor: pointer; padding: 0; margin-left: 10px; font-size: inherit; font-family: inherit; }
+    .nav-link-style { color: inherit; text-decoration: none; }
+    .nav-link-style p { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <div class="funcoes-container">
+    <% if (user && user.isAdmin) { %>
+        <div class="upload-p"><a href="/admin/artworks/validate" class="nav-link-style"><p>Validação</p></a></div>
+        <div class="permissoes-p"><a href="/admin/permissions" class="nav-link-style"><p>Permissões</p></a></div>
+        <div class="cadastro_artistas-p"><a href="/admin/artists/new" class="nav-link-style"><p>Cad. Artistas</p></a></div>
+        <div class="cadastro_obras-p"><a href="/artworks/new" class="nav-link-style"><p>Cad. Obras</p></a></div>
+        <div class="dashboard-p"><a href="/dashboard" class="nav-link-style"><p class="favoritos-text">Dashboard</p></a></div>
+    <% } else if (user) { %>
+        <div class="upload-p"><a href="/artworks/new" class="nav-link-style"><p>Cadastrar Obra</p></a></div>
+        <div class="dashboard-p"><a href="/" class="nav-link-style"><p>Galeria</p></a></div> <% } %>
+    <div class="perfil-container" style="display: flex; align-items: center;">
+      <img src="<%= (user && user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
+      <% if (user) { %>
+        <p class="login-link" style="margin-bottom:0; margin-right: 5px;"><%= user.name %></p>
+        <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
+      <% } else { %>
+        <a href="/login" class="login-link nav-link-style">Login</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="container-titulo">
+      <img src="/img/unnamed.png" alt="Logo" class="logo-class">
+      <p class="titulo">Art Gallery</p>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <h3>Dashboard Administrador</h3>
+
+    <div class="cards">
+      <div class="card">
+        <p class="cards-p">Total de Usuários</p>
+        <div class="container-visualizacoes">
+          <h2 class="container-h2"><%= stats ? stats.totalUsers : 'N/A' %></h2>
+          </div>
+      </div>
+      <div class="card">
+        <p class="cards-p">Total de Artistas</p>
+        <div class="container-visualizacoes">
+          <h2 class="container-h2"><%= stats ? stats.totalArtists : 'N/A' %></h2>
+        </div>
+      </div>
+      <div class="card">
+        <p class="cards-p">Obras Aprovadas</p>
+        <div class="container-visualizacoes">
+          <h2 class="container-h2"><%= stats ? stats.totalArtworks : 'N/A' %></h2>
+        </div>
+      </div>
+      <div class="card">
+        <p class="cards-p">Obras Pendentes</p>
+        <div class="container-visualizacoes">
+          <h2 class="container-h2"><%= stats ? stats.pendingArtworks : 'N/A' %></h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-graficos">
+      <div class="chart-container">
+        <h3>Total Usuários (Dados Fictícios)</h3>
+        <canvas id="lineChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Locais com mais acessos (Dados Fictícios)</h3>
+        <canvas id="doughnutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gráfico de linha (dados fixos como no seu HTML)
+    const ctxLine = document.getElementById('lineChart')?.getContext('2d');
+    if (ctxLine) {
+      new Chart(ctxLine, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+          datasets: [
+            {
+              label: 'Mês Atual',
+              data: [10, 20, 15, 25, 20, 30, 35], // Dados fictícios
+              borderColor: '#A3C4FF',
+              tension: 0.4,
+              fill: false,
+              borderWidth: 2
+            },
+            {
+              label: 'Mês Anterior',
+              data: [20, 15, 18, 22, 27, 30, 30], // Dados fictícios
+              borderColor: '#000',
+              borderDash: [5, 5],
+              tension: 0.4,
+              fill: false,
+              borderWidth: 2
+            }
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { display: true, position: 'top' } } }
+      });
+    }
+
+    // Gráfico de Rosca (dados fixos como no seu HTML)
+    const ctxDoughnut = document.getElementById('doughnutChart')?.getContext('2d');
+    if (ctxDoughnut) {
+      new Chart(ctxDoughnut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Estados Unidos', 'Brasil', 'Canadá', 'Outros'],
+          datasets: [{
+            label: 'Acessos',
+            data: [36.6, 22.5, 30.8, 8.1], // Dados fictícios
+            backgroundColor: ['#A3C4FF', '#B2F2BB', '#D0BFFF', '#CED4DA'],
+            borderWidth: 1
+          }]
+        },
+        options: { responsive: true, cutout: '60%', plugins: { legend: { position: 'right' } } }
+      });
+    }
+
+    // Script de Logout
+    <% if (user) { %>
+      const logoutButtonDash = document.getElementById('logoutButtonEJS');
+      if(logoutButtonDash) {
+          logoutButtonDash.addEventListener('click', async function() {
+              try {
+                  const response = await fetch('/api/auth/logout', { method: 'POST' });
+                  const result = await response.json();
+                  if (response.ok) {
+                      window.location.href = '/login'; 
+                  } else {
+                      throw new Error(result.error || 'Falha ao fazer logout.');
+                  }
+              } catch (error) {
+                  alert('Erro ao tentar sair: ' + error.message);
+              }
+          });
+      }
+    <% } %>
+  </script>
+
+  <footer>
+    </footer>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>

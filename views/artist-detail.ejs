@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/styleguide.css">
+  <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <style>
+    /* Estilos adicionais ou ajustes rápidos podem ir aqui ou no homepage.css */
+    .logout-button-style { /* Estilo para o botão de logout, se não definido em homepage.css */
+        background: none; 
+        border: none; 
+        color: #fff; /* Ou a cor do texto do seu menu */
+        cursor: pointer; 
+        padding: 0; 
+        margin-left: 10px; 
+        font-size: inherit; /* Herda o tamanho da fonte do parágrafo */
+        font-family: inherit;
+    }
+    .nav-link-style { color: inherit; text-decoration: none; }
+    .nav-link-style p { margin-bottom: 0; }
+    .container-biografia-p .texto.blur {
+        /* Para o efeito de "Ler Mais", ajuste a altura e o overflow */
+        max-height: 6em; /* Aproximadamente 3 linhas, ajuste conforme necessário */
+        overflow: hidden;
+        position: relative;
+        transition: max-height 0.5s ease-out;
+    }
+    .container-biografia-p .texto.expandido {
+        max-height: 1000px; /* Altura suficiente para mostrar todo o texto */
+    }
+    .container-biografia-p .botao-ler-mais.oculto {
+        display: none;
+    }
+    .botao-seguir.seguindo { /* Classe para o botão quando estiver "Seguindo" */
+      background-color: #28a745; /* Exemplo de cor verde */
+      color: white;
+      /* Outros estilos que você definiu para 'seguindo' */
+    }
+    .botao-seguir svg { /* Estilo para o SVG dentro do botão 'Seguindo' */
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+    <div class="funcoes-container">
+        <div class="artista-p">
+            <a href="/#artists-section" class="nav-link-style"><p class="artista-text">Artistas</p></a>
+        </div> 
+        <% if (user && user.isAdmin) { %>
+            <div class="upload-p"><a href="/admin/artworks/validate" class="nav-link-style"><p>Validação</p></a></div>
+            <div class="favoritos-p"><a href="/admin/permissions" class="nav-link-style"><p>Permissões</p></a></div>
+            <div><a href="/admin/artists/new" class="nav-link-style"><p>Cad. Artistas</p></a></div>
+            <div><a href="/artworks/new" class="nav-link-style"><p>Cad. Obras</p></a></div>
+        <% } else if (user) { %>
+            <div class="upload-p"><a href="/artworks/new" class="nav-link-style"><p>Cadastrar Obra</p></a></div>
+            <% } %>
+        <div class="perfil-container" style="display: flex; align-items: center;">
+            <img src="<%= (user && user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
+            <% if (user) { %>
+                <p class="login-link" style="margin-bottom:0; margin-right: 5px;"><%= user.name %></p>
+                <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
+            <% } else { %>
+                <a href="/login" class="login-link nav-link-style">Login</a>
+                <a href="/register" class="login-link nav-link-style" style="margin-left:10px;">Registrar</a>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="container-titulo">
+            <img src="/img/unnamed.png" alt="Logo" class="logo-class">
+            <p class="titulo">Art Gallery</p>
+        </div>
+    </div>
+
+    <div class="categorias-container">
+        <p>Mais recentes</p>
+        <p>Mais vendidos</p>
+        <p>Pintura a óleo</p>
+        <p>Rabiscos</p>
+        <p>Arte Digital</p>
+        <p>Fotorrealismo</p>
+        <p>Fotografia</p>
+        <img class="lupa" src="/img/lupa.png" alt="Buscar">
+    </div>
+
+    <% if (artist) { %>
+    <div class="container-artistas"> <div class="container-opcao-artista1"> <div class="container-artistas-geral1">
+                <div class="artista1-container">
+                    <img class="artista1" src="<%= artist.mainImage || '/img/placeholder-artist.png' %>" alt="<%= artist.Name %>">
+                    <p class="artista-jean"><%= artist.Name.toUpperCase() %></p>
+                </div>
+                <button class="botao-biografia1 botao-seguir" onclick="alternarSeguir(this)">+ Seguir</button>
+            </div>
+            <div class="container-biografia-p" id="conteudoBiografia">
+                <p class="biografia-p"><%- artist.Biography ? artist.Biography.split('\n').join('<br>') : 'Biografia não disponível.' %></p>
+                </div>
+        </div>
+
+        <h2 class="obras-p" style="text-align:center; font-size: 22px; margin: 40px 0 20px 0;">Obras de <%= artist.Name %></h2>
+        <div class="container-pinturas" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 0 10px;">
+            <% if (artworks && artworks.length > 0) { %>
+                <% artworks.forEach(artwork => { %>
+                    <div class="container-amostras" style="width: 300px; border: 1px solid #E0E0E0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); margin-bottom:20px; background-color: #fff;">
+                        <img class="imagem-container artwork-grid-item-image" src="<%= artwork.ImageURL || '/img/placeholder-artwork.png' %>" alt="<%= artwork.Title %>">
+                        <div class="container-tema" style="padding-top: 15px;">
+                            <p class="tema-container" style="font-weight: bold; font-size: 1.1em; margin-bottom: 5px;"><%= artwork.Title %></p>
+                            <p class="preco" style="color: green; font-weight: bold; margin-bottom: 15px;">(Preço a definir)</p>
+                            <div class="button-pinturas" style="margin-top:10px;">
+                                <button class="detalhes-pinturas-container" onclick="alert('Página de detalhes para obra ID <%= artwork.ArtworkID %> não implementada.')">Ver Detalhes</button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p style="text-align:center;">Este artista ainda não possui obras aprovadas cadastradas.</p>
+            <% } %>
+        </div>
+    </div>
+    <% } else { %>
+        <p style="text-align: center; font-size: 1.2em; margin-top: 30px;">Artista não encontrado.</p>
+    <% } %>
+
+    <footer>
+      <div class="footer-top">
+        <div class="footer-logo">
+          <img src="/img/unnamed.png" alt="Logo">
+        </div>
+        <div class="footer-links">
+          <a href="#">Sobre</a>
+          <a href="#">Termos de Uso</a>
+          <a href="#">Contato</a>
+          <a href="#">Redes Sociais</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Função para expandir/recolher texto da biografia
+      function setupLerMais() {
+        const conteudoDiv = document.getElementById('conteudoBiografia');
+        if (!conteudoDiv) return;
+
+        const biografiaP = conteudoDiv.querySelector('.biografia-p');
+        if (!biografiaP) return;
+
+        // Verifica se o texto é maior que a altura definida para o "blur"
+        // A altura de 'blur' é 6em. Precisamos de uma forma de medir isso.
+        // Uma aproximação: se o scrollHeight for maior que uma altura X (ex: 100px)
+        const alturaMaximaInicial = 6 * parseFloat(getComputedStyle(biografiaP).lineHeight); // Aproximadamente 6 linhas
+        
+        if (biografiaP.scrollHeight > alturaMaximaInicial + 20) { // Adiciona uma margem de tolerância
+            biografiaP.classList.add('texto'); // Adiciona classe para estilos iniciais de resumo
+            biografiaP.classList.add('blur');   // Adiciona classe para o efeito de resumo
+
+            let lerMaisButton = conteudoDiv.querySelector('.botao-ler-mais');
+            if (!lerMaisButton) {
+                lerMaisButton = document.createElement('button');
+                lerMaisButton.classList.add('botao-ler-mais');
+                lerMaisButton.textContent = 'Ler Mais';
+                conteudoDiv.appendChild(lerMaisButton);
+            }
+
+            lerMaisButton.onclick = function() {
+                biografiaP.classList.remove('blur');
+                biografiaP.classList.add('expandido'); // Classe para expandir
+                this.style.display = 'none'; // Esconde o botão "Ler Mais"
+            };
+        } else {
+            // Se o texto não for longo o suficiente, remove classes e o botão se existir
+            biografiaP.classList.remove('texto');
+            biografiaP.classList.remove('blur');
+            const lerMaisButton = conteudoDiv.querySelector('.botao-ler-mais');
+            if (lerMaisButton) {
+                lerMaisButton.remove();
+            }
+        }
+      }
+      
+      // Função para alternar seguir/seguindo (visual apenas)
+      function alternarSeguir(botao) {
+        botao.classList.toggle("seguindo"); // Adiciona ou remove a classe .seguindo
+        if (botao.classList.contains("seguindo")) {
+          botao.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="white" viewBox="0 0 24 24" style="margin-right: 5px; vertical-align: middle;">
+              <path d="M20.285 6.709l-11.285 11.292-5.285-5.293 1.414-1.414 3.871 3.879 9.871-9.879z"/>
+            </svg>
+            Seguindo
+          `;
+        } else {
+          botao.innerHTML = '+ Seguir';
+        }
+        // Aqui iria a chamada API para o backend para realmente seguir/deixar de seguir o artista
+        // alert(`Funcionalidade de seguir/deixar de seguir (ID: ${botao.dataset.artistId}) não implementada no backend.`);
+      }
+
+      // Chamar setupLerMais quando o DOM estiver pronto
+      document.addEventListener('DOMContentLoaded', setupLerMais);
+
+      // Script de Logout (se o botão logoutButtonEJS existir)
+      <% if (user) { %>
+        const logoutBtn = document.getElementById('logoutButtonEJS');
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/auth/logout', { method: 'POST' });
+                    const result = await response.json();
+                    if (response.ok) {
+                        window.location.href = '/login'; 
+                    } else {
+                        throw new Error(result.error || 'Falha ao fazer logout.');
+                    }
+                } catch (error) {
+                    console.error('Erro no logout:', error);
+                    alert('Erro ao tentar sair: ' + error.message);
+                }
+            });
+        }
+      <% } %>
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>

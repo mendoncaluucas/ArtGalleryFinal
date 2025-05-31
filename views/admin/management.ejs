@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/globals.css">   <link rel="stylesheet" href="/css/styleguide.css"> <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style>
+    /* Estilos rápidos. Mova para seu CSS externo. */
+    body { font-family: sans-serif; }
+    .main-content-area { padding: 20px; max-width: 1400px; margin: 0 auto;} /* Adicionado para conter o conteúdo */
+    .top-buttons button { margin-right: 10px; padding: 8px 15px; cursor: pointer; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 4px; }
+    .top-buttons button.selected { background-color: #007bff; color: white; border-color: #007bff; }
+    .search-bar { margin: 20px 0; display: flex; gap: 10px; }
+    .search-bar input[type="text"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1; }
+    .search-bar .search-btn, .search-bar .export-btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    .search-btn { background-color: #28a745; color: white; }
+    .export-btn { background-color: #17a2b8; color: white; }
+    .table-obras { width: 100%; margin-top: 10px; border-collapse: collapse; }
+    .table-obras th, .table-obras td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .table-obras th { background-color: #f2f2f2; }
+    .status { padding: 3px 7px; border-radius: 10px; color: white; font-size: 0.9em; }
+    .status.pronto, .status.approved { background-color: #28a745; } /* Verde */
+    .status.pending_review { background-color: #ffc107; color: #333 } /* Amarelo */
+    .status.rejected { background-color: #dc3545; } /* Vermelho */
+    .action-icons i { cursor: pointer; margin: 0 5px; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; text-align: center; border-radius: 8px; }
+    .modal-actions button { padding: 10px 20px; margin: 10px; cursor: pointer; border-radius: 4px; border: none; }
+    .cancel-btn { background-color: #ccc; }
+    .confirm-btn { background-color: #dc3545; color: white; }
+    .nav-link-style { color: inherit; text-decoration: none; } /* Para links no menu */
+    .nav-link-style p { margin-bottom: 0; }
+    .logout-button-style { background: none; border: none; color: #fff; cursor: pointer; padding: 0; margin-left: 10px; font-size: inherit; font-family: inherit; }
+
+  </style>
+</head>
+<body>
+  <div class="funcoes-container">
+    <% if (user && user.isAdmin) { %>
+        <div class="upload-p"><a href="/admin/artworks/validate" class="nav-link-style"><p>Validação</p></a></div>
+        <div class="permissoes-p"><a href="/admin/permissions" class="nav-link-style"><p>Permissões</p></a></div>
+        <div class="cadastro_artistas-p"><a href="/admin/artists/new" class="nav-link-style"><p>Cad. Artistas</p></a></div>
+        <div class="cadastro_obras-p"><a href="/artworks/new" class="nav-link-style"><p>Cad. Obras</p></a></div>
+        <div class="gerenciamento-p"><a href="/admin/management" class="nav-link-style"><p class="favoritos-text">Gerenciamento</p></a></div>
+        <div class="dashboard-p"><a href="/dashboard" class="nav-link-style"><p>Dashboard</p></a></div>
+    <% } else if (user) { %>
+        <div class="upload-p"><a href="/artworks/new" class="nav-link-style"><p>Cadastrar Obra</p></a></div>
+        <div class="favoritos-p"><a href="/favorites" class="nav-link-style"><p>Favoritos</p></a></div>
+    <% } %>
+    <div class="perfil-container" style="display: flex; align-items: center;">
+      <img src="<%= (user && user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
+      <% if (user) { %>
+        <p class="login-link" style="margin-bottom:0; margin-right: 5px;"><%= user.name %></p>
+        <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
+      <% } else { %>
+        <a href="/login" class="login-link nav-link-style">Login</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="container-titulo">
+      <img src="/img/unnamed.png" alt="Logo" class="logo-class">
+      <p class="titulo">Art Gallery</p>
+    </div>
+  </div>
+
+<main class="container-gerenciamento main-content-area"> <h1><%= pageTitle %></h1>
+    
+    <div class="top-buttons">
+      <button id="tabArtworks" class="selected" data-type="artworks">Encontrar obras</button>
+      <button id="tabArtists" data-type="artists">Artistas</button>
+      <button id="tabAccounts" data-type="users">Contas</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Buscar por Nome/Título...">
+      <button class="search-btn" id="searchBtn">Pesquisar</button>
+      <button class="export-btn" id="exportBtn">Exportar Excel</button>
+    </div>
+
+    <p class="encontrado">Encontrado: <strong id="foundCount"><%= initialData ? initialData.length : 0 %></strong></p>
+
+    <table class="table-obras" id="managementTable">
+      <thead id="tableHead">
+        </thead>
+      <tbody id="tableBody">
+        <% if (initialDataType === 'artworks' && initialData && initialData.length > 0) { %>
+          <% initialData.forEach(item => { %>
+            <tr data-id="<%= item.ArtworkID %>">
+              <td><%= item.ArtworkID %></td>
+              <td><a href="#" onclick="alert('Link para detalhe/edição da obra ID ' + <%= item.ArtworkID %>)"><%= item.Title %></a></td>
+              <td><%= item.ArtistName || 'N/A' %></td>
+              <td><%= item.CreationYear || 'N/A' %></td>
+              <td><span class="status <%= item.status ? item.status.replace('_', '-') : '' %>"><%= item.status || 'N/A' %></span></td>
+              <td class="action-icons">
+                <i class="fas fa-edit edit-btn" title="Editar"></i>
+                <i class="fas fa-trash delete-btn" title="Excluir"></i>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else if (initialDataType === 'artworks') { %>
+            <tr><td colspan="6">Nenhuma obra encontrada.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+</main>
+
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <p id="modalMessage">Tem certeza que deseja excluir o item?</p>
+    <div class="modal-actions">
+      <button id="cancelBtn" class="cancel-btn"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="confirmBtn" class="confirm-btn"><i class="fas fa-check"></i> Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentDataType = '<%= initialDataType %>'; // 'artworks', 'artists', ou 'users'
+  let currentItemIdToDelete = null;
+  const adminToken = localStorage.getItem('adminAuthToken'); // Assumindo que o token de admin está aqui
+
+  const tableHead = document.getElementById('tableHead');
+  const tableBody = document.getElementById('tableBody');
+  const foundCountEl = document.getElementById('foundCount');
+  const searchInput = document.getElementById('searchInput');
+  
+  const modal = document.getElementById("confirmModal");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const confirmBtn = document.getElementById("confirmBtn");
+  const modalMessage = document.getElementById("modalMessage");
+
+  const tabButtons = {
+      artworks: document.getElementById('tabArtworks'),
+      artists: document.getElementById('tabArtists'),
+      users: document.getElementById('tabAccounts')
+  };
+
+  function updateTableHeaders(type) {
+      let headers = [];
+      if (type === 'artworks') {
+          headers = ['ID', 'Título', 'Artista', 'Ano', 'Status', 'Ações'];
+      } else if (type === 'artists') {
+          headers = ['ID', 'Nome', 'Nacionalidade', 'Ano Nasc.', 'Ações'];
+      } else if (type === 'users') {
+          headers = ['ID', 'Nome', 'Email', 'Admin?', 'Ações'];
+      }
+      tableHead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+  }
+
+  function populateTable(data, type) {
+      tableBody.innerHTML = ''; // Limpa a tabela
+      if (!data || data.length === 0) {
+          const cols = tableHead.rows[0] ? tableHead.rows[0].cells.length : 5;
+          tableBody.innerHTML = `<tr><td colspan="${cols}">Nenhum item encontrado.</td></tr>`;
+          foundCountEl.textContent = 0;
+          return;
+      }
+      foundCountEl.textContent = data.length;
+
+      data.forEach(item => {
+          const row = tableBody.insertRow();
+          row.setAttribute('data-id', item.ArtworkID || item.ArtistID || item.UserID);
+          let cells = '';
+          if (type === 'artworks') {
+              cells = `
+                  <td>${item.ArtworkID}</td>
+                  <td><a href="#" onclick="alert('Editar/ver obra ID ${item.ArtworkID}')">${item.Title}</a></td>
+                  <td>${item.ArtistName || 'N/A'}</td>
+                  <td>${item.CreationYear || 'N/A'}</td>
+                  <td><span class="status ${item.status ? item.status.replace('_', '-') : ''}">${item.status || 'N/A'}</span></td>
+              `;
+          } else if (type === 'artists') {
+              cells = `
+                  <td>${item.ArtistID}</td>
+                  <td><a href="/artists/${item.ArtistID}/details">${item.Name}</a></td>
+                  <td>${item.Nationality || 'N/A'}</td>
+                  <td>${item.BirthYear || 'N/A'}</td>
+              `;
+          } else if (type === 'users') {
+              cells = `
+                  <td>${item.UserID}</td>
+                  <td>${item.Name}</td>
+                  <td>${item.Email}</td>
+                  <td><span class="status ${item.IsAdmin ? 'approved' : 'rejected'}">${item.IsAdmin ? 'Sim' : 'Não'}</span></td>
+              `;
+          }
+          cells += `
+              <td class="action-icons">
+                  <i class="fas fa-edit edit-btn" title="Editar"></i>
+                  <i class="fas fa-trash delete-btn" title="Excluir"></i>
+              </td>
+          `;
+          row.innerHTML = cells;
+      });
+      attachActionListeners(); // Reanexa listeners para os novos botões
+  }
+  
+  async function fetchData(type, searchTerm = '') {
+      if (!adminToken) {
+          alert('Administrador não autenticado.');
+          return;
+      }
+      let apiUrl = `/api/${type}`;
+      if (searchTerm) {
+          apiUrl += `?search=${encodeURIComponent(searchTerm)}`; // Ou ?name= para usuários
+          if (type === 'users' && searchTerm) apiUrl = `/api/users/search?name=${encodeURIComponent(searchTerm)}`;
+      }
+
+      try {
+          const response = await fetch(apiUrl, {
+              headers: { 'Authorization': `Bearer ${adminToken}` }
+          });
+          if (!response.ok) {
+              const errData = await response.json();
+              throw new Error(errData.error || `Falha ao buscar ${type}`);
+          }
+          const data = await response.json();
+          currentDataType = type;
+          updateTableHeaders(type);
+          populateTable(data, type);
+      } catch (error) {
+          console.error(`Erro ao buscar ${type}:`, error);
+          tableBody.innerHTML = `<tr><td colspan="5">Erro ao carregar dados: ${error.message}</td></tr>`;
+          foundCountEl.textContent = 0;
+      }
+  }
+
+  function attachActionListeners() {
+      document.querySelectorAll(".delete-btn").forEach(trashBtn => {
+          trashBtn.addEventListener("click", function() {
+              currentItemIdToDelete = this.closest("tr").dataset.id;
+              modalMessage.textContent = `Tem certeza que deseja excluir o item ID ${currentItemIdToDelete}? (${currentDataType})`;
+              modal.style.display = "block";
+          });
+      });
+
+      document.querySelectorAll(".edit-btn").forEach(editBtn => {
+          editBtn.addEventListener("click", function () {
+              const itemId = this.closest("tr").dataset.id;
+              // Redirecionar para página de edição ou abrir modal de edição
+              alert(`Editar item ID ${itemId} do tipo ${currentDataType} (funcionalidade não implementada no EJS).`);
+              // Exemplo de redirecionamento para edição de artista:
+              // if (currentDataType === 'artists') window.location.href = `/admin/artists/${itemId}/edit-form`;
+          });
+      });
+  }
+
+  // Event listeners para as abas
+  Object.values(tabButtons).forEach(button => {
+      button.addEventListener('click', function() {
+          Object.values(tabButtons).forEach(btn => btn.classList.remove('selected'));
+          this.classList.add('selected');
+          const type = this.dataset.type;
+          searchInput.value = ''; // Limpa busca ao mudar de aba
+          searchInput.placeholder = type === 'users' ? 'Buscar por Nome/Email...' : 'Buscar por Título/Nome...';
+          fetchData(type);
+      });
+  });
+
+  // Event listener para o botão de busca
+  document.getElementById('searchBtn').addEventListener('click', () => {
+      fetchData(currentDataType, searchInput.value);
+  });
+  searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+          fetchData(currentDataType, searchInput.value);
+      }
+  });
+
+
+  // Lógica do Modal de Confirmação
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => { modal.style.display = "none"; });
+  }
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", async () => {
+        if (currentItemIdToDelete && adminToken) {
+            try {
+                const response = await fetch(`/api/${currentDataType}/${currentItemIdToDelete}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Falha ao excluir.');
+                alert(result.message);
+                fetchData(currentDataType, searchInput.value); // Atualiza a tabela
+            } catch (error) {
+                alert('Erro ao excluir: ' + error.message);
+            }
+        }
+        modal.style.display = "none";
+        currentItemIdToDelete = null;
+    });
+  }
+  
+  // Carregar dados iniciais e configurar ouvintes
+  document.addEventListener('DOMContentLoaded', () => {
+      updateTableHeaders('<%= initialDataType %>');
+      // Os dados iniciais já estão renderizados pelo EJS, então só precisamos anexar os listeners
+      attachActionListeners();
+      if (tabButtons['<%= initialDataType %>']) {
+          tabButtons['<%= initialDataType %>'].classList.add('selected');
+           searchInput.placeholder = '<%= initialDataType %>' === 'users' ? 'Buscar por Nome/Email...' : 'Buscar por Título/Nome...';
+      }
+  });
+
+  // Script de Logout
+  <% if (user) { %>
+    const logoutButtonManage = document.getElementById('logoutButtonEJS');
+    if(logoutButtonManage) {
+        logoutButtonManage.addEventListener('click', async function() { /* ... (código de logout igual ao do index.ejs) ... */ });
+    }
+  <% } %>
+
+</script>
+
+<footer>
+  </footer>
+    
+</body>
+</html>

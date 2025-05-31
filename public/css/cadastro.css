@@ -1,0 +1,377 @@
+.cadastro {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.cadastro .div {
+  background-color: #ffffff;
+  overflow: hidden;
+  width: 1920px;
+  height: 1080px;
+  position: relative;
+}
+
+.cadastro .image {
+  position: absolute;
+  width: 941px;
+  height: 1080px;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+}
+
+.cadastro .unnamed {
+  position: absolute;
+  width: 72px;
+  height: 74px;
+  top: 23px;
+  left: 1750px;
+}
+
+.cadastro .adobecolor-my-color {
+  position: absolute;
+  width: 1600px;
+  height: 954px;
+  top: 2687px;
+  left: -8787px;
+  object-fit: cover;
+}
+
+.cadastro .overlap {
+  position: absolute;
+  width: 483px;
+  height: 942px;
+  top: 97px;
+  left: 1156px;
+}
+
+.cadastro .login-form {
+  display: flex;
+  flex-direction: column;
+  width: 483px;
+  height: 914px;
+  align-items: flex-start;
+  gap: 48px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.cadastro .intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  position: relative;
+  align-self: stretch;
+  width: 105%;
+  flex: 0 0 auto;
+  height: 130px;;
+}
+
+.cadastro .text-wrapper {
+  position: relative;
+  width: 258px;
+  margin-top: -1.00px;
+  font-family: "Abel-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--primary-text);
+  font-size: 36px;
+  letter-spacing: 0.36px;
+  line-height: 36px;
+}
+
+.cadastro .p {
+  position: relative;
+  align-self: stretch;
+  font-family: "ABeeZee-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--secondary-text);
+  font-size: 20px;
+  letter-spacing: 0.20px;
+  line-height: 32.0px;
+}
+
+.cadastro .form {
+  display: flex;
+  flex-direction: column;
+  height: 486px;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}
+
+.cadastro .input {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-top: -1.00px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}
+
+.cadastro .label {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--primary-text);
+  font-size: 16px;
+  letter-spacing: 0.16px;
+  line-height: 16px;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.cadastro .overlap-group-wrapper {
+  height: 48px;
+  margin-right: -2.00px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}
+
+.cadastro .overlap-group {
+  position: relative;
+  width: 485px;
+  height: 50px;
+  top: -1px;
+  left: -1px;
+  background-color: #f6faff;
+  border-radius: 12px;
+  border: 1px solid;
+  border-color: #d3d7e3;
+}
+
+.cadastro .placeholder {
+  position: absolute;
+  height: 16px;
+  top: 16px;
+  left: 20px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: #8796ad;
+  font-size: 16px;
+  letter-spacing: 0.16px;
+  line-height: 16px;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.cadastro .input-2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 0 0 auto;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}
+
+.cadastro .label-2 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--primary-text);
+  font-size: 16px;
+  letter-spacing: 0.16px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.cadastro .placeholder-2 {
+  position: absolute;
+  height: 16px;
+  top: 16px;
+  left: 20px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: #8796ad;
+  font-size: 16px;
+  letter-spacing: 0.16px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.cadastro .main-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 10px;
+  padding: 16px 0px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+  background-color: #162d3a;
+  border-radius: 12px;
+}
+
+.cadastro .sign-in {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: #ffffff;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0.20px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.cadastro .para-criar-uma-conta {
+  position: relative;
+  width: 298px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: transparent;
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0.14px;
+  line-height: 14px;
+  left: 90px;
+}
+
+.cadastro .span {
+  color: #000000;
+  letter-spacing: 0.02px;
+}
+
+.cadastro .text-wrapper-2 {
+  color: #1e4ae9;
+  letter-spacing: 0.02px;
+}
+
+.cadastro .social-sign-in {
+  display: flex;
+  flex-direction: column;
+  height: 145px;
+  align-items: flex-start;
+  gap: 24px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+}
+
+.cadastro .or {
+  display: flex;
+  width: 467px;
+  height: 35px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 0px;
+  position: relative;
+}
+
+.cadastro .line {
+  position: relative;
+  flex: 1;
+  flex-grow: 1;
+  height: 1px;
+  object-fit: cover;
+}
+
+.cadastro .text-wrapper-3 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.50px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: #294956;
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 0.16px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.cadastro .social-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  flex: 0 0 auto;
+  margin-bottom: -34.00px;
+}
+
+.cadastro .social-button {
+  display: flex;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 9px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  background-color: #f3f9fa;
+  border-radius: 12px;
+}
+
+.cadastro .img {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.cadastro .sign-in-with {
+  position: relative;
+  width: fit-content;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: var(--secondary-text);
+  font-size: 16px;
+  letter-spacing: 0.16px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.cadastro .voc-j-possui-conta {
+  position: absolute;
+  width: 382px;
+  height: 29px;
+  top: 913px;
+  left: 62px;
+  font-family: "Roboto-Regular", Helvetica;
+  font-weight: 400;
+  color: transparent;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 0.18px;
+  line-height: 28.8px;
+}
+
+.cadastro .text-wrapper-4 {
+  color: #313957;
+  letter-spacing: 0.03px;
+}
+
+.cadastro .text-wrapper-5 {
+  color: #1e4ae9;
+  letter-spacing: 0.03px;
+}
+
+

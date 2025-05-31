@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    </head>
+<body>
+    <div class="form-container"> <form id="artworkUploadForm"> <div>
+                <label for="titulo">Título da Obra</label>
+                <input type="text" id="titulo" name="Title"> <label for="descricao">Descrição</label>
+                <input type="text" id="descricao" name="Description">
+
+                <label for="ano">Ano de Criação</label>
+                <input type="text" id="ano" name="CreationYear">
+
+                <label for="artistIdSelect">Artista</label>
+                <select id="artistIdSelect" name="ArtistID">
+                    </select>
+                
+                <label for="mediumInput">Técnica/Meio</label>
+                <input type="text" id="mediumInput" name="Medium">
+
+                <label for="dimensionsInput">Dimensões</label>
+                <input type="text" id="dimensionsInput" name="Dimensions">
+
+            </div>
+
+            <div class="upload-container">
+                <div class="upload-box" id="drop-area">
+                    <input type="file" id="fileInput" hidden> </div>
+                <button type="submit" class="submit-button" id="submitBtnArtwork">Enviar para aprovação</button>
+            </div>
+        </form>
+        <div class="modal" id="modal">
+            </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ...></script>
+    <script>
+        // SEU CÓDIGO JAVASCRIPT EXISTENTE PARA DRAG & DROP E MODAL
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('fileInput'); // Este é o input type="file"
+        const modal = document.getElementById('modal');
+        // const submitBtn = document.getElementById('submitBtn'); // Este botão agora será o submit do formulário
+
+        if(dropArea) {
+            dropArea.addEventListener('dragover', (e) => {
+              e.preventDefault();
+              dropArea.style.borderColor = '#1c87ff';
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+              dropArea.style.borderColor = '#3fa9f5'; // Ou a cor original
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+              e.preventDefault();
+              if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                alert(`Arquivo "${fileInput.files[0].name}" carregado com sucesso! (via drop)`);
+              }
+              dropArea.style.borderColor = '#3fa9f5'; // Ou a cor original
+            });
+        }
+        // Se o clique na dropArea deve abrir o seletor de arquivos:
+        if(dropArea && fileInput) {
+            dropArea.addEventListener('click', () => fileInput.click());
+        }
+
+
+        function closeModal() {
+          if(modal) modal.style.display = 'none';
+        }
+        // Fecha modal ao clicar fora (mantido do seu HTML original)
+        window.addEventListener('click', (e) => {
+          if (modal && e.target === modal) closeModal();
+        });
+
+
+        // ---- CÓDIGO JAVASCRIPT QUE EU ENVIEI PARA SUBMISSÃO DO FORMULÁRIO ----
+        const artworkForm = document.getElementById('artworkUploadForm'); // ID DO SEU FORMULÁRIO
+        
+        if (artworkForm) {
+            artworkForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const token = localStorage.getItem('userAuthToken'); // Ou a chave que você usa para usuários logados
+                
+                if (!token) {
+                    alert('Autenticação necessária para enviar a obra.');
+                    // Redirecionar para login se necessário: window.location.href = '/login';
+                    return;
+                }
+
+                const formData = new FormData();
+                
+                // Pegue os valores dos seus inputs pelos IDs corretos
+                formData.append('Title', document.getElementById('titulo').value);
+                formData.append('Description', document.getElementById('descricao').value);
+                formData.append('CreationYear', document.getElementById('ano').value);
+                
+                // ADICIONE OS OUTROS CAMPOS QUE VOCÊ COLOCAR NO FORMULÁRIO EJS
+                const artistIdElement = document.getElementById('artistIdSelect'); // Exemplo
+                if (artistIdElement) formData.append('ArtistID', artistIdElement.value);
+                
+                const mediumElement = document.getElementById('mediumInput'); // Exemplo
+                if (mediumElement) formData.append('Medium', mediumElement.value);
+
+                const dimensionsElement = document.getElementById('dimensionsInput'); // Exemplo
+                if (dimensionsElement) formData.append('Dimensions', dimensionsElement.value);
+
+
+                // Adiciona o arquivo
+                if (fileInput.files.length > 0) {
+                    formData.append('artworkImage', fileInput.files[0]); // 'artworkImage' é o nome do campo esperado pelo multer
+                } else {
+                    // Decida o que fazer se nenhuma imagem for selecionada.
+                    // O backend pode aceitar uma ImageURL manual se você tiver esse campo,
+                    // ou você pode tornar a imagem obrigatória aqui no frontend.
+                    alert('Por favor, selecione um arquivo de imagem para a obra.');
+                    return; 
+                }
+
+                try {
+                    const response = await fetch('/api/artworks', {
+                        method: 'POST',
+                        headers: {
+                            // NÃO defina 'Content-Type' aqui para FormData com arquivos!
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData 
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Falha ao enviar obra.');
+                    }
+                    
+                    // alert(result.message); // O modal substitui o alert
+                    if(modal) modal.style.display = 'flex'; // Mostra seu modal de sucesso
+                    artworkForm.reset(); // Limpa o formulário
+
+                } catch (error) {
+                    console.error('Erro ao enviar obra:', error);
+                    alert('Erro: ' + error.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

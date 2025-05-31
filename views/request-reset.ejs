@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/css/globals.css" />
+    <link rel="stylesheet" href="/css/styleguide.css" />
+    <link rel="stylesheet" href="/css/redefinir.css" /> <title><%= pageTitle %></title>
+    <style> /* Mensagens de feedback */
+        .form-feedback { text-align: center; margin-top: 15px; font-weight: bold; }
+        .form-feedback.success { color: green; }
+        .form-feedback.error { color: red; }
+    </style>
+  </head>
+  <body>
+    <div class="redefinir-senha"> <div class="div">
+        <img class="image" src="/img/image2.png" alt="Background Image" /> <img class="unnamed" src="/img/unnamed.png" alt="Logo Small" />
+        <div class="login-form"> <div class="intro">
+            <div class="text-wrapper">ART GALLERY</div>
+            <p class="p">Onde a arte encontra seu lugar.</p>
+            <h2 style="font-size: 24px; margin-top: 10px; color: var(--primary-text);">Redefinir Senha</h2>
+          </div>
+          <form id="requestResetForm" class="form">
+            <div class="input">
+              <label for="resetEmail" class="label">E-mail</label> <div class="overlap-group-wrapper">
+                <div class="overlap-group">
+                  <input id="resetEmail" name="Email" class="placeholder" placeholder="Email@email.com" type="email" required />
+                </div>
+              </div>
+            </div>
+            <p class="text-wrapper-2" style="font-size: 14px; color: var(--secondary-text);">Seu código de liberação será enviado por e-mail.</p>
+            <button type="submit" class="main-button">
+                <div class="sign-in">Enviar</div>
+            </button>
+          </form>
+          <p id="formFeedbackMessage" class="form-feedback"></p>
+
+          <div class="social-sign-in">
+            <div class="or">
+              <img class="line" src="/img/line-2.svg" alt="Line" />
+              <div class="text-wrapper-3">Ou</div>
+              <img class="line" src="/img/line-1.svg" alt="Line" />
+            </div>
+            <div class="social-buttons">
+              <div class="social-button">
+                <img class="img" src="/img/google.png" alt="Google Icon" />
+                <div class="sign-in-with">Entrar com o Google</div>
+              </div>
+              <div class="social-button">
+                <img class="img" src="/img/facebook.png" alt="Facebook Icon" />
+                <div class="sign-in-with-2">Entrar com o Facebook</div>
+              </div>
+            </div>
+          </div>
+          <p class="voc-n-o-possui-conta"> <span class="span">Você não possui conta? </span> 
+            <a href="/register" class="text-wrapper-4">Cadastre-se</a>
+          </p>
+          <p class="voc-n-o-possui-conta" style="margin-top: 10px;"> <span class="span">Lembrou sua senha? </span> 
+            <a href="/login" class="text-wrapper-4">Faça login</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        document.getElementById('requestResetForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const feedbackEl = document.getElementById('formFeedbackMessage');
+            feedbackEl.textContent = ''; // Limpa mensagens anteriores
+
+            const email = document.getElementById('resetEmail').value;
+            const data = { Email: email };
+
+            try {
+                feedbackEl.textContent = 'Processando...';
+                feedbackEl.className = 'form-feedback';
+
+                const response = await fetch('/api/auth/request-password-reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    // Mesmo que o backend retorne 200 para email não encontrado,
+                    // um erro 500 real ainda pode acontecer.
+                    throw new Error(result.error || 'Falha ao solicitar redefinição.');
+                }
+                
+                feedbackEl.className = 'form-feedback success';
+                feedbackEl.textContent = result.message; // Ex: "Se um usuário... link foi enviado."
+                
+                // Não redirecionar, apenas mostrar a mensagem.
+                // O usuário deve checar o email (ou o console do backend, no nosso caso).
+                document.getElementById('requestResetForm').reset();
+
+
+            } catch (error) {
+                console.error('Erro ao solicitar redefinição de senha:', error);
+                feedbackEl.className = 'form-feedback error';
+                feedbackEl.textContent = 'Erro: ' + error.message;
+            }
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/styleguide.css">
+  <link rel="stylesheet" href="/css/homepage.css"> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Ajustes rápidos e placeholders visuais */
+    .logout-button-style { background: none; border: none; color: #fff; cursor: pointer; padding: 0; margin-left: 10px; font-size: inherit; font-family: inherit; }
+    .nav-link-style { color: inherit; text-decoration: none; }
+    .nav-link-style p { margin-bottom: 0; }
+    .artwork-grid-item-image { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
+    .icons-reaction i { margin: 0 10px; font-size: 1.5em; cursor: pointer; color: #555; }
+    .icons-reaction i.favorited { color: #e74c3c; } /* Cor para coração favoritado */
+    .container-jardim { position: relative; } /* Para posicionar ícones sobre a imagem se necessário */
+    .artist-detail-link { text-decoration: none; color: inherit; }
+  </style>
+</head>
+<body>
+    <div class="funcoes-container">
+        <div class="artista-p">
+            <a href="/#artists-section" class="nav-link-style"><p class="artista-text">Artistas</p></a>
+        </div> 
+        <% if (user && user.isAdmin) { %>
+            <div class="upload-p"><a href="/admin/artworks/validate" class="nav-link-style"><p>Validação</p></a></div>
+            <div class="permissoes-p"><a href="/admin/permissions" class="nav-link-style"><p>Permissões</p></a></div>
+            <div><a href="/admin/artists/new" class="nav-link-style"><p>Cad. Artistas</p></a></div>
+        <% } %>
+        <% if (user) { %>
+            <div class="cadastro_obras-p"><a href="/artworks/new" class="nav-link-style"><p>Cad. Obras</p></a></div>
+            <div class="favoritos-p"><a href="/favorites" class="nav-link-style"><p>Favoritos</p></a></div>
+        <% } %>
+        <div class="perfil-container" style="display: flex; align-items: center;">
+          <img src="<%= (user && user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
+          <% if (user) { %>
+            <p class="login-link" style="margin-bottom:0; margin-right: 5px;"><%= user.name %></p>
+            <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
+          <% } else { %>
+            <a href="/login" class="login-link nav-link-style">Login</a>
+            <a href="/register" class="login-link nav-link-style" style="margin-left:10px;">Registrar</a>
+          <% } %>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="container-titulo">
+            <img src="/img/unnamed.png" alt="Logo" class="logo-class">
+            <p class="titulo">Art Gallery</p>
+        </div>
+    </div>
+
+    <div class="categorias-container">
+        <p><a href="#" class="nav-link-style">Mais recentes</a></p>
+        <p><a href="#" class="nav-link-style">Mais vendidos</a></p>
+        <p><a href="#" class="nav-link-style">Fotografia</a></p>
+        <img class="lupa" src="/img/lupa.png" alt="Buscar">
+    </div>
+
+    <% if (artwork) { %>
+    <div class="container-jardim-florido" style="max-width: 1200px; margin: 20px auto; padding: 15px;">
+        <div class="container-obra-descricao" style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <div class="container-jardim" style="flex: 1; min-width: 300px; max-width: 600px;">
+                <img class="imagem-jardim-florido" src="<%= artwork.ImageURL || '/img/placeholder-artwork.png' %>" alt="<%= artwork.Title %>" style="width:100%; border-radius: 8px;">
+                <div class="icons-reaction" style="margin-top: 15px; text-align: center;">
+                    <i class="fa-regular fa-heart" id="favoriteIcon_<%= artwork.ArtworkID %>" onclick="toggleFavorite('<%= artwork.ArtworkID %>')"></i>
+                    <i class="fa-solid fa-comments" onclick="alert('Seção de comentários não implementada.')"></i>
+                    <i class="fa-solid fa-share-nodes" onclick="alert('Compartilhar não implementado.')"></i>
+                </div>
+            </div>
+            <div class="container-h1-p-jardim" style="flex: 1.5; min-width: 300px;">
+                <h1><%= artwork.Title.toUpperCase() %></h1>
+                <p class="p-jardim-florido"><%- artwork.Description ? artwork.Description.split('\n').join('<br>') : 'Descrição não disponível.' %></p>
+                <% if(artwork.Medium) { %><p><strong>Técnica:</strong> <%= artwork.Medium %></p><% } %>
+                <% if(artwork.Dimensions) { %><p><strong>Dimensões:</strong> <%= artwork.Dimensions %></p><% } %>
+                <% if(artwork.CreationYear) { %><p><strong>Ano:</strong> <%= artwork.CreationYear %></p><% } %>
+            </div>
+        </div>
+
+        <% if (artistOfArtwork) { %>
+        <div class="container-jardim-artista" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+            <h1 class="comentarios-h1">Artista</h1>
+            <div class="img-p-jardim" style="display: flex; align-items: center; justify-content: space-between; margin-bottom:15px;">
+                <a href="/artists/<%= artistOfArtwork.ArtistID %>/details" class="artist-detail-link" style="display: flex; align-items: center;">
+                    <div class="artista-montreal">
+                        <img class="artista-jardim" src="<%= artistOfArtwork.mainImage || '/img/placeholder-artist.png' %>" alt="<%= artistOfArtwork.Name %>" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                        <p style="margin-left: 10px; font-size: 1.2em; font-weight: bold;"><%= artistOfArtwork.Name %></p>
+                    </div>
+                </a>
+                <button class="botao-biografia2 botao-seguir" onclick="alternarSeguir(this)">+ Seguir</button>
+            </div>
+            <div class="container-biografia-montreal">
+                <p><%= artistOfArtwork.Biography ? artistOfArtwork.Biography.substring(0, 200) + (artistOfArtwork.Biography.length > 200 ? '...' : '') : 'Biografia não disponível.' %></p>
+            </div>
+            <a href="/artists/<%= artistOfArtwork.ArtistID %>/details" class="detalhes-pinturas-container1" style="display: inline-block; margin-top: 10px; padding: 8px 15px; background-color: #eee; text-decoration: none; color: #333; border-radius: 4px;">Ver Detalhes do Artista</a>
+        </div>
+        <% } %>
+    </div>
+
+    <div class="container-comentarios-obras" style="max-width: 1200px; margin: 20px auto; padding: 15px;">
+        <div class="container-comentarios" style="margin-bottom: 30px;">
+            <h1 class="comentarios-h1">Comentários</h1>
+            <% if (comments && comments.length > 0) { %>
+                <% comments.forEach(comment => { %>
+                    <div class="usuario-nome" style="display:flex; align-items:center; margin-bottom:5px;">
+                        <img class="usuario" src="<%= comment.AvatarURL || '/img/usuario.png' %>" alt="Avatar" style="width:30px; height:30px; border-radius:50%; margin-right:10px;">
+                        <p><strong><%= comment.UserName %>:</strong></p>
+                    </div>
+                    <p style="margin-left: 40px; margin-bottom:15px;"><%= comment.Text %></p>
+                <% }); %>
+            <% } else { %>
+                <p>Ainda não há comentários para esta obra.</p>
+            <% } %>
+            <button class="detalhes-pinturas-container2" onclick="alert('Adicionar comentário não implementado.')" style="margin-top:10px;">+ Adicionar comentários</button>
+        </div>
+
+        <div class="obras-artistas-container-h1">
+            <h1 class="obras-similares">Obras Similares</h1>
+            <div class="container-pinturas2" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px;">
+                <% if (similarArtworks && similarArtworks.length > 0) { %>
+                    <% similarArtworks.forEach(simArtwork => { %>
+                        <div class="container-amostras" style="width: 250px; border: 1px solid #E0E0E0; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); margin-bottom:20px; background-color: #fff;">
+                            <a href="/artworks/<%= simArtwork.ArtworkID %>/details-public" class="nav-link-style">
+                                <img class="imagem-container artwork-grid-item-image" src="<%= simArtwork.ImageURL || '/img/placeholder-artwork.png' %>" alt="<%= simArtwork.Title %>">
+                                <div class="container-tema1" style="padding-top: 10px;">
+                                    <p class="tema-container" style="font-weight: bold;"><%= simArtwork.Title %></p>
+                                    <p class="preco">(Preço a definir)</p>
+                                </div>
+                            </a>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p>Nenhuma obra similar encontrada.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <% } else { %>
+        <p style="text-align:center; font-size: 1.2em; margin-top:50px;">Obra de arte não encontrada.</p>
+    <% } %>
+
+
+    <script>
+       function alternarSeguir(botao) {
+            // ... (sua função alternarSeguir existente) ...
+            // Adicionar chamada API para seguir/deixar de seguir artista aqui no futuro
+       }
+
+       async function toggleFavorite(artworkId) {
+            const userToken = localStorage.getItem('userAuthToken'); // Ou a chave que você usa
+            if (!userToken) {
+                alert('Você precisa estar logado para favoritar obras.');
+                // window.location.href = '/login'; // Opcional
+                return;
+            }
+
+            const heartIcon = document.getElementById(`favoriteIcon_${artworkId}`);
+            // Determinar se estamos favoritando ou desfavoritando pela classe do ícone
+            // (Você precisaria de uma lógica para saber o estado inicial ao carregar a página)
+            // Por agora, vamos assumir que se não tiver a classe 'favorited', vamos tentar favoritar.
+            let isCurrentlyFavorited = heartIcon ? heartIcon.classList.contains('fa-solid') : false; // Simplificação
+            
+            const method = isCurrentlyFavorited ? 'DELETE' : 'POST';
+            const actionText = isCurrentlyFavorited ? 'desfavoritar' : 'favoritar';
+
+            try {
+                const response = await fetch(`/api/artworks/${artworkId}/favorite`, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || `Falha ao ${actionText}.`);
+                
+                alert(result.message);
+                // Atualizar o ícone do coração visualmente
+                if (heartIcon) {
+                    if (method === 'POST') { // Se favoritou
+                        heartIcon.classList.remove('fa-regular');
+                        heartIcon.classList.add('fa-solid', 'favorited');
+                    } else { // Se desfavoritou
+                        heartIcon.classList.remove('fa-solid', 'favorited');
+                        heartIcon.classList.add('fa-regular');
+                    }
+                }
+            } catch (err) {
+                alert(`Erro ao ${actionText}: ${err.message}`);
+            }
+       }
+        // Script de Logout (copie do index.ejs se precisar)
+        <% if (user) { %>
+            const logoutBtnDetail = document.getElementById('logoutButtonEJS');
+            if(logoutBtnDetail) {
+                logoutBtnDetail.addEventListener('click', async function() { /* ... (código de logout igual ao do index.ejs) ... */ });
+            }
+        <% } %>
+    </script>
+
+    <footer>
+      </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>

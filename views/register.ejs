@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/css/globals.css" />
+    <link rel="stylesheet" href="/css/styleguide.css" />
+    <link rel="stylesheet" href="/css/cadastro.css" />
+    <title><%= pageTitle %></title>
+  </head>
+  <body>
+    <div class="cadastro">
+      <div class="div">
+        <img class="image" src="/img/image1.png" alt="Background Image" />
+        <img class="unnamed" src="/img/unnamed.png" alt="Logo Small" />
+        <img class="adobecolor-my-color" src="/img/adobecolor-my-color-theme-1.png" alt="Color Theme Artifact" />
+        <div class="overlap">
+          <form id="registerForm" class="login-form">
+            <div class="intro">
+              <div class="text-wrapper">ART GALLERY</div>
+              <p class="p">Onde a arte encontra seu lugar.</p>
+            </div>
+            <div class="form">
+              <div class="input">
+                <div class="label-2">Email</div>
+                <div class="overlap-group-wrapper">
+                  <div class="overlap-group">
+                    <input class="placeholder" name="Email" placeholder="Email@gmail.com" type="email" required />
+                  </div>
+                </div>
+              </div>
+              <div class="input-2">
+                <div class="label-2">Senha</div>
+                <div class="overlap-group-wrapper">
+                  <div class="overlap-group"> 
+                    <input class="placeholder" name="Password" placeholder="No mínimo 8 caracteres" type="password" required />
+                  </div>
+                </div>
+              </div>
+              <div class="input-2">
+                <div class="label-2">Confirme senha</div>
+                <div class="overlap-group-wrapper">
+                  <div class="overlap-group">
+                    <input class="placeholder" name="ConfirmPassword" placeholder="Confirme senha" type="password" required />
+                  </div>
+                </div>
+              </div>
+              <div class="input-2">
+                <div class="label-2">Nome</div>
+                <div class="overlap-group-wrapper">
+                  <div class="overlap-group">
+                   <input class="placeholder" name="Name" placeholder="Digite um Nome" type="text" required />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="main-button">
+                <div class="sign-in">Criar Conta</div>
+              </button>
+              <p class="para-criar-uma-conta">
+                <span class="span">Para criar uma conta, é necessário aceitar os </span>
+                <span class="text-wrapper-2">Termos e Condições.</span>
+              </p>
+            </div>
+            <div class="social-sign-in">
+              <div class="or">
+                <img class="line" src="/img/line-2.svg" alt="Line" />
+                <div class="text-wrapper-3">Ou</div>
+                <img class="line" src="/img/line-1.svg" alt="Line" />
+              </div>
+              <div class="social-buttons">
+                <div class="social-button">
+                  <img class="img" src="/img/google.png" alt="Google Icon" />
+                  <div class="sign-in-with">Cadastrar-se com o Google</div>
+                </div>
+                <div class="social-button">
+                  <img class="img" src="/img/facebook.png" alt="Facebook Icon" />
+                  <div class="sign-in-with">Cadastrar-se com o Facebook</div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <p class="voc-j-possui-conta">
+            <span class="text-wrapper-4">Você já possui conta? </span> 
+            <a href="/login" class="text-wrapper-5">Faça login</a> </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const messageEl = document.getElementById('registerMessage') || document.createElement('p'); // Cria se não existir
+            if (!document.getElementById('registerMessage')) {
+                messageEl.id = 'registerMessage';
+                messageEl.style.textAlign = 'center';
+                messageEl.style.marginTop = '15px';
+                this.parentNode.insertBefore(messageEl, this.nextSibling); // Insere após o form
+            }
+            messageEl.textContent = '';
+
+            const name = event.target.Name.value;
+            const email = event.target.Email.value;
+            const password = event.target.Password.value;
+            const confirmPassword = event.target.ConfirmPassword.value;
+
+            if (password !== confirmPassword) {
+                messageEl.style.color = 'red';
+                messageEl.textContent = 'As senhas não coincidem!';
+                return;
+            }
+
+            if (password.length < 6) { // Adicionando validação de tamanho da senha que temos no backend
+                messageEl.style.color = 'red';
+                messageEl.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+                return;
+            }
+
+            const data = { Name: name, Email: email, Password: password };
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'Falha ao registrar.');
+                }
+                messageEl.style.color = 'green';
+                messageEl.textContent = result.message + ' Você será redirecionado para o login...';
+                setTimeout(() => {
+                    window.location.href = '/login'; // Rota da sua página de login EJS
+                }, 2500);
+            } catch (error) {
+                console.error('Erro ao registrar:', error);
+                messageEl.style.color = 'red';
+                messageEl.textContent = 'Erro: ' + error.message;
+            }
+        });
+
+        // Ajuste para o link "Faça login" se o seletor original não funcionar
+        // O seletor original era '.text-wrapper-5' dentro de '.voc-j-possui-conta'
+        const loginLinkElement = document.querySelector

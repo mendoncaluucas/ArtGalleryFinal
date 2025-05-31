@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/globals.css">    <link rel="stylesheet" href="/css/styleguide.css"> <link rel="stylesheet" href="/css/permissions.css"> <style>
+      /* Estilo básico para o botão de logout no header, caso não esteja global */
+      .logout-button-style { background: none; border: none; color: var(--primary-text); /* Cor baseada no header claro */ cursor: pointer; padding: 0; font-size: inherit; font-family: inherit; margin-left:10px;}
+      .nav-link-style { color: inherit; text-decoration: none; }
+      .nav-link-style p { margin-bottom: 0; }
+      /* Estilos para o menu superior, adapte ao seu .funcoes-container do homepage.css ou Figma */
+      /* Este header é um placeholder, você pode precisar integrar com o seu menu global que está no seu homepage.css */
+      .permissions-header-placeholder {
+          background-color: #FFFFFF; 
+          color: var(--primary-text);
+          padding: 15px 30px;
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid #E5E8EB; /* Cor de borda do Figma */
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.03);
+          font-family: var(--www-figma-com-inter-regular-font-family); /* Usando variável de fonte */
+      }
+      .permissions-header-placeholder .logo-placeholder img { height: 30px; margin-right: auto; }
+      .permissions-header-placeholder .nav-links a { margin-left: 20px; text-decoration: none; color: var(--secondary-text); font-weight: 500; }
+      .permissions-header-placeholder .nav-links a.active { color: var(--link); font-weight: 600; } /* Usando var(--link) se existir */
+      .permissions-header-placeholder .perfil-container { margin-left: auto; display: flex; align-items: center;}
+      .permissions-header-placeholder .perfil-container img { width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;}
+      .permissions-header-placeholder .perfil-container .login-link { color: var(--primary-text); font-weight: 500; }
+    </style>
+</head>
+<body class="permissions-page-body"> <header class="permissions-header-placeholder">
+        <div class="logo-placeholder">
+             <img src="/img/unnamed.png" alt="Art Gallery Logo" />
+        </div>
+        <nav class="nav-links">
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin/artworks/validate" class="<%= currentPath === '/admin/artworks/validate' ? 'active' : '' %>">Upload/Validação</a>
+                <a href="/admin/permissions" class="<%= currentPath === '/admin/permissions' ? 'active' : '' %>">Permissões</a>
+                <a href="/admin/artists/new" class="<%= currentPath === '/admin/artists/new' ? 'active' : '' %>">Cad. Artistas</a>
+                <a href="/artworks/new" class="<%= currentPath === '/artworks/new' ? 'active' : '' %>">Cad. Obras</a>
+                <a href="/admin/management" class="<%= currentPath === '/admin/management' ? 'active' : '' %>">Gerenciamento</a>
+                <a href="/dashboard" class="<%= currentPath === '/dashboard' ? 'active' : '' %>">Dashboard</a>
+            <% } %>
+        </nav>
+        <div class="perfil-container">
+          <% if (user) { %>
+            <img src="<%= (user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
+            <a href="/profile" class="login-link nav-link-style"><%= user.name %></a>
+            <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
+          <% } else { %>
+            <a href="/login" class="login-link nav-link-style">Entrar</a>
+          <% } %>
+        </div>
+    </header>
+    <div class="permissions-page-container">
+        <main class="permissions-main-content">
+            <header class="page-header">
+                <h1><%= pageTitle %></h1>
+                <p class="subtitle">Liberação de acesso administrador</p>
+            </header>
+            
+            <section class="users-section">
+                <h2>Usuários</h2>
+                <div class="search-container">
+                    <input type="search" class="search-bar" placeholder="Search" id="userSearchInput">
+                </div>
+
+                <div id="user-list" class="user-list-items">
+                    <% if (users && users.length > 0) { %>
+                        <% users.forEach(u => { %>
+                            <div class="user-item" data-userid="<%= u.UserID %>" data-username="<%= u.Name.toLowerCase() %>">
+                                <div class="user-avatar-placeholder">
+                                    <%= u.Name.substring(0,1).toUpperCase() %>
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name"><%= u.Name %></span>
+                                </div>
+                                <div class="user-actions">
+                                    <span 
+                                        class="icon-action icon-toggle <%= u.IsAdmin ? 'icon-admin-active' : 'icon-action-inactive' %>" 
+                                        title="<%= u.IsAdmin ? 'Este usuário já é Administrador' : 'Promover para Administrador' %>"
+                                        onclick="<%= (adminUser && u.UserID === adminUser.userId) ? '' : (u.IsAdmin ? '' : `toggleAdminStatus('${u.UserID}', true)`) %>"
+                                        role="button"
+                                        tabindex="0"
+                                        style="<%= (adminUser && u.UserID === adminUser.userId && u.IsAdmin) ? 'cursor:not-allowed;' : '' %>">
+                                        ✓
+                                    </span>
+                                    <span 
+                                        class="icon-action icon-toggle <%= !u.IsAdmin ? 'icon-common-active' : 'icon-action-inactive' %>"
+                                        title="<%= !u.IsAdmin ? 'Este usuário já é Comum' : 'Rebaixar para Usuário Comum' %>"
+                                        onclick="<%= (adminUser && u.UserID === adminUser.userId) ? '' : (!u.IsAdmin ? '' : `toggleAdminStatus('${u.UserID}', false)`) %>"
+                                        role="button"
+                                        tabindex="0"
+                                        style="<%= (adminUser && u.UserID === adminUser.userId) ? 'cursor:not-allowed;' : '' %>">
+                                        ✕
+                                    </span>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>Nenhum usuário encontrado.</p>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+
+        <aside class="permissions-sidebar-legend">
+            <div class="legend-box">
+                <h2>Legenda</h2>
+                <div class="legend-item">
+                    <span class="legend-icon legend-icon-admin">✓</span> Administrador
+                </div>
+                <div class="legend-item">
+                    <span class="legend-icon legend-icon-common">✕</span> Usuário Comum 
+                </div>
+                <div class="admin-count">
+                    <span class="admin-avatars-placeholder">
+                        <span>👤</span><span>👤</span> </span>
+                    + <%= typeof adminCount !== 'undefined' ? adminCount : (users ? users.filter(u => u.IsAdmin).length : 0) %> administradores
+                </div>
+                <button class="add-new-button" title="Adicionar novo usuário (funcionalidade futura)">+</button>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Script para toggleAdminStatus (já fornecido anteriormente)
+        async function toggleAdminStatus(userIdToToggle, newIsAdminStatus) {
+            const userRow = document.querySelector(`.user-item[data-userid="${userIdToToggle}"]`);
+            const userNameElement = userRow ? userRow.querySelector('.user-name') : null;
+            const userName = userNameElement ? userNameElement.textContent : `ID ${userIdToToggle}`;
+            const actionText = newIsAdminStatus ? "promover" : "rebaixar";
+            const roleText = newIsAdminStatus ? "Administrador" : "Usuário Comum";
+
+            if (!confirm(`Tem certeza que deseja ${actionText} o usuário "${userName}" para ${roleText}?`)) {
+                return;
+            }
+            const token = localStorage.getItem('adminAuthToken'); 
+            if (!token) {
+                alert('Token de administrador não encontrado.'); return;
+            }
+            try {
+                const response = await fetch(`/api/users/${userIdToToggle}/admin`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                    body: JSON.stringify({ isAdmin: newIsAdminStatus })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Falha ao atualizar.');
+                alert(result.message || 'Status atualizado!');
+                window.location.reload();
+            } catch (error) { alert(`Erro: ${error.message}`); }
+        }
+
+        // Script para busca client-side (já fornecido)
+        const searchInput = document.getElementById('userSearchInput');
+        const userItems = Array.from(document.getElementsByClassName('user-item'));
+        if (searchInput && userItems.length > 0) {
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                userItems.forEach(item => {
+                    const userNameFromData = item.dataset.username; 
+                    if (userNameFromData.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Script de Logout
+        <% if (user) { %>
+            const logoutButtonPerms = document.getElementById('logoutButtonEJS');
+            if(logoutButtonPerms) {
+                logoutButtonPerms.addEventListener('click', async function() {
+                    try {
+                        const response = await fetch('/api/auth/logout', { method: 'POST' });
+                        if (response.ok) { window.location.href = '/login'; }
+                        else { const result = await response.json(); throw new Error(result.error || 'Falha no logout.'); }
+                    } catch (error) { alert('Erro ao sair: ' + error.message); }
+                });
+            }
+        <% } %>
+    </script>
+</body>
+</html>
