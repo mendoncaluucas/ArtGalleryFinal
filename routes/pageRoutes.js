@@ -22,6 +22,8 @@ router.get('/enter-reset-token', pageController.renderEnterResetTokenPage);
 // Rota para a página EJS de efetiva redefinição de senha
 router.get('/set-new-password-page', pageController.renderSetNewPasswordPage);
 
+router.get('/artists', pageController.renderArtistsListPage);
+
 // ---- ROTA PARA A PÁGINA DE PERFIL DO USUÁRIO (EJS) ----
 // Acessível por qualquer usuário logado para ver seu próprio perfil
 router.get('/profile', protect, pageController.renderUserProfilePage);

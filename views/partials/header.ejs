@@ -1,0 +1,78 @@
+<header class="funcoes-container">
+    <div class="artista-p">
+        <a href="/artists" class="nav-link-style <%= currentPath === '/artists' ? 'active' : '' %>">
+            <p class="artista-text">Artistas</p>
+        </a>
+    </div>
+
+    <% if (user) { %>
+        <div class="upload-p">
+            <a href="/artworks/new" class="nav-link-style <%= currentPath === '/artworks/new' ? 'active' : '' %>">
+                <p>Cadastrar Obra</p>
+            </a>
+        </div>
+        <div class="favoritos-p">
+            <a href="/favorites" class="nav-link-style <%= currentPath === '/favorites' ? 'active' : '' %>">
+                <p>Favoritos</p>
+            </a>
+        </div>
+    <% } %>
+
+    <% if (user && user.isAdmin) { %>
+        <div class="upload-p">
+            <a href="/admin/artworks/validate" class="nav-link-style <%= currentPath === '/admin/artworks/validate' ? 'active' : '' %>">
+                <p>Validação</p>
+            </a>
+        </div>
+        <div class="permissoes-p">
+            <a href="/admin/permissions" class="nav-link-style <%= currentPath === '/admin/permissions' ? 'active' : '' %>">
+                <p>Permissões</p>
+            </a>
+        </div>
+        <div class="cadastro_artistas-p">
+            <a href="/admin/artists/new" class="nav-link-style <%= currentPath === '/admin/artists/new' ? 'active' : '' %>">
+                <p>Cad. Artistas</p>
+            </a>
+        </div>
+        <div class="gerenciamento-p">
+            <a href="/admin/management" class="nav-link-style <%= currentPath === '/admin/management' ? 'active' : '' %>">
+                <p>Gerenciamento</p>
+            </a>
+        </div>
+        <div class="dashboard-p">
+            <a href="/dashboard" class="nav-link-style <%= currentPath === '/dashboard' ? 'active' : '' %>">
+                <p>Dashboard</p>
+            </a>
+        </div>
+    <% } %>
+
+    <div class="perfil-container">
+        <% if (user) { %>
+            <a href="/profile">
+                <img src="<%= (user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
+            </a>
+            <a href="/profile" class="login-link nav-link-style">
+                <p style="margin: 0 5px;"><%= user.name %></p>
+            </a>
+            <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
+        <% } else { %>
+            <a href="/login" class="login-link nav-link-style">Entrar</a>
+            <a href="/register" class="login-link nav-link-style" style="margin-left:10px;">Registrar</a>
+        <% } %>
+    </div>
+</header>
+
+<div class="container">
+  <div class="container-titulo">
+    <img src="/img/unnamed.png" alt="Logo" class="logo-class">
+    <p class="titulo">Art Gallery</p>
+  </div>
+</div>
+
+<% if (user) { %>
+<script>
+    // Este script precisa estar no final da página principal, não no partial,
+    // ou ser colocado em um arquivo JS separado e incluído.
+    // Para simplificar, vamos deixar o script nas páginas principais.
+</script>
+<% } %>

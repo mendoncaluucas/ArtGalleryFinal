@@ -1,14 +1,16 @@
-
+// art-gallery-backend-novo/controllers/authController.js
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // Para gerar tokens aleatórios
 require('dotenv').config();
 
-// Função para registrar um novo usuário
+// @desc    Registrar um novo usuário e fazer login automaticamente
+// @route   POST /api/auth/register
 exports.registerUser = async (req, res, next) => {
-    const { Name, Email, Password, IsAdmin = false } = req.body;
+    const { Name, Email, Password } = req.body;
 
+    // Validações
     if (!Name || !Email || !Password) {
         return res.status(400).json({ error: 'Nome, Email e Senha são obrigatórios.' });
     }
@@ -24,24 +26,55 @@ exports.registerUser = async (req, res, next) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(Password, salt);
-
-        const newUser = { Name, Email, Password: hashedPassword, IsAdmin };
+        const newUser = { Name, Email, Password: hashedPassword, IsAdmin: false };
         const [result] = await db.query('INSERT INTO Users SET ?', newUser);
+        const newUserId = result.insertId;
+
+        // Lógica de login automático após registro
+        const payload = {
+            userId: newUserId,
+            name: Name,
+            email: Email,
+            isAdmin: false
+        };
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '1h' });
+
+        let maxAgeMs = 1 * 60 * 60 * 1000; // Default 1 hora
+        if (process.env.JWT_EXPIRES_IN) {
+            const unit = process.env.JWT_EXPIRES_IN.slice(-1).toLowerCase();
+            const value = parseInt(process.env.JWT_EXPIRES_IN.slice(0, -1));
+            if (!isNaN(value)) {
+                if (unit === 'd') maxAgeMs = value * 24 * 60 * 60 * 1000;
+                else if (unit === 'h') maxAgeMs = value * 60 * 60 * 1000;
+                else if (unit === 'm') maxAgeMs = value * 60 * 1000;
+            }
+        }
+
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+            path: '/',
+            maxAge: maxAgeMs
+        };
+        
+        res.cookie('jwt', token, cookieOptions);
 
         res.status(201).json({
             message: 'Usuário registrado com sucesso!',
-            userId: result.insertId,
-            name: Name,
-            email: Email,
-            isAdmin: IsAdmin
+            token: token,
+            user: payload
         });
+
     } catch (error) {
         console.error('Erro ao registrar usuário:', error);
         next(error);
     }
 };
 
-// Função para login de usuário
+// @desc    Login de usuário
+// @route   POST /api/auth/login
 exports.loginUser = async (req, res, next) => {
     const { Email, Password } = req.body;
 
@@ -68,11 +101,7 @@ exports.loginUser = async (req, res, next) => {
             isAdmin: user.IsAdmin ? true : false
         };
 
-        const token = jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
-        );
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '1h' });
 
         let maxAgeMs = 1 * 60 * 60 * 1000; // Default 1 hora
         if (process.env.JWT_EXPIRES_IN) {
@@ -112,7 +141,8 @@ exports.loginUser = async (req, res, next) => {
     }
 };
 
-// Função para Logout (limpa o cookie)
+// @desc    Logout de usuário
+// @route   POST /api/auth/logout
 exports.logoutUser = (req, res) => {
     res.cookie('jwt', '', {
         httpOnly: true,
@@ -122,7 +152,8 @@ exports.logoutUser = (req, res) => {
     res.status(200).json({ message: 'Logout bem-sucedido.' });
 };
 
-// Função para solicitar redefinição de senha
+// @desc    Solicitar redefinição de senha
+// @route   POST /api/auth/request-password-reset
 exports.requestPasswordReset = async (req, res, next) => {
     const { Email } = req.body;
 
@@ -132,7 +163,6 @@ exports.requestPasswordReset = async (req, res, next) => {
 
     try {
         const [users] = await db.query('SELECT * FROM Users WHERE Email = ?', [Email]);
-
         if (users.length === 0) {
             return res.status(200).json({ message: 'Se um usuário com este email existir, instruções para redefinir a senha foram enviadas.' });
         }
@@ -147,55 +177,50 @@ exports.requestPasswordReset = async (req, res, next) => {
             user.UserID
         ]);
 
-        // A página EJS /reset-password-page receberá este token como query param
-        const resetPageUrl = `${req.protocol}://${req.get('host')}/reset-password-page?token=${resetToken}`; 
+        const resetPageUrl = `${req.protocol}://${req.get('host')}/set-new-password-page?token=${resetToken}`; 
 
         console.log('--------------------------------------------------------------------');
-        console.log('SIMULAÇÃO DE ENVIO DE EMAIL/CÓDIGO PARA REDEFINIÇÃO DE SENHA:');
+        console.log('SIMULAÇÃO DE ENVIO DE CÓDIGO/LINK PARA REDEFINIÇÃO DE SENHA:');
         console.log(`Para: ${user.Email}`);
-        console.log(`Link para a página de redefinição (contém o token): ${resetPageUrl}`);
-        console.log(`Ou, se for usar uma página "Insira o código", o código é: ${resetToken}`);
+        console.log(`Seu código/token de redefinição é: ${resetToken}`);
+        console.log(`O link completo para a página de redefinição é: ${resetPageUrl}`);
         console.log('--------------------------------------------------------------------');
 
         res.status(200).json({ message: 'Se um usuário com este email existir, instruções para redefinir a senha foram enviadas para seu email.' });
-
     } catch (error) {
         console.error('Erro ao solicitar redefinição de senha:', error);
         res.status(500).json({ error: 'Ocorreu um erro ao processar sua solicitação.' });
     }
 };
 
-// Função para verificar o token de redefinição (para a página "Insira o código")
+// @desc    Verificar o token de redefinição
+// @route   POST /api/auth/verify-reset-token
 exports.verifyResetToken = async (req, res, next) => {
     const { token: submittedToken } = req.body; 
-
     if (!submittedToken) {
         return res.status(400).json({ error: 'Token é obrigatório.' });
     }
-
     try {
         const hashedTokenToCompare = crypto.createHash('sha256').update(submittedToken).digest('hex');
         const query = 'SELECT UserID FROM Users WHERE resetPasswordToken = ? AND resetPasswordExpires > NOW()';
         const [users] = await db.query(query, [hashedTokenToCompare]);
-
         if (users.length === 0) {
             return res.status(400).json({ error: 'Código de redefinição inválido ou expirado.' });
         }
-        
         res.status(200).json({ 
             message: 'Código verificado com sucesso.',
-            resetToken: submittedToken // Envia o token original para ser usado na próxima etapa
+            resetToken: submittedToken
         });
-
     } catch (error) {
         console.error('Erro ao verificar token de redefinição:', error);
         res.status(500).json({ error: 'Ocorreu um erro ao processar sua solicitação.' });
     }
 };
 
-// Função para efetivamente redefinir a senha
+// @desc    Redefinir a senha
+// @route   POST /api/auth/reset-password/:token
 exports.resetPassword = async (req, res, next) => {
-    const resetToken = req.params.token; // Token original da URL
+    const resetToken = req.params.token;
     const { Password, ConfirmPassword } = req.body;
 
     if (!Password || !ConfirmPassword) {
@@ -226,7 +251,7 @@ exports.resetPassword = async (req, res, next) => {
             [hashedPassword, user.UserID]
         );
         
-        res.cookie('jwt', '', { httpOnly: true, path:'/', expires: new Date(0) }); // Limpa cookie de login antigo
+        res.cookie('jwt', '', { httpOnly: true, path:'/', expires: new Date(0) });
 
         res.status(200).json({ message: 'Senha redefinida com sucesso! Você já pode fazer login com sua nova senha.' });
 

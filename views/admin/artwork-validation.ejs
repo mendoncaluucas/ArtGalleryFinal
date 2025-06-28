@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/homepage.css">
+    <style>
+        /* Estilos rápidos para esta página. Mova para um arquivo .css se preferir. */
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f7f6; }
+        .container { max-width: 1200px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: middle; }
+        th { background-color: #f2f2f2; }
+        td img.artwork-thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
+        .actions button { margin-right: 8px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+        .actions button:hover { opacity: 0.8; }
+        .approve-btn { background-color: #28a745; color: white; }
+        .reject-btn { background-color: #dc3545; color: white; }
+        .status-pending { color: #ffc107; font-weight: bold; text-transform: capitalize; }
+        .logout-button-style { background: none; border: none; color: inherit; cursor: pointer; padding: 0; margin-left: 10px; font-size: inherit; font-family: inherit; }
+    </style>
+</head>
+<body>
+   
+  
+    <%- include('../partials/header'); %>
+        <h2>Obras Pendentes de Revisão</h2>
+        <% if (artworks && artworks.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagem</th>
+                        <th>Título</th>
+                        <th>Artista</th>
+                        <th>Ano</th>
+                        <th>Status Atual</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% artworks.forEach(artwork => { %>
+                        <tr>
+                            <td><%= artwork.ArtworkID %></td>
+                            <td>
+                                <% if (artwork.ImageURL) { %>
+                                    <img src="<%= artwork.ImageURL %>" alt="Miniatura de <%= artwork.Title %>" class="artwork-thumbnail">
+                                <% } else { %>
+                                    Sem Imagem
+                                <% } %>
+                            </td>
+                            <td><%= artwork.Title %></td>
+                            <td><%= artwork.ArtistName || 'N/A' %></td>
+                            <td><%= artwork.CreationYear || 'N/A' %></td>
+                            <td class="status-pending"><%= artwork.status.replace('_', ' ') %></td>
+                            <td class="actions">
+                                <button class="approve-btn" onclick="approveArtwork('<%= artwork.ArtworkID %>')">✓ Aprovar</button>
+                                <button class="reject-btn" onclick="rejectArtwork('<%= artwork.ArtworkID %>')">✕ Rejeitar</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>Nenhuma obra de arte pendente de revisão no momento.</p>
+        <% } %>
+    </div>
+
+<script>
+    const adminToken = localStorage.getItem('adminAuthToken'); // Certifique-se que esta é a chave correta
+
+    async function handleArtworkAction(artworkId, actionType) {
+        if (!adminToken) {
+            alert('Administrador não autenticado.');
+            return;
+        }
+        const confirmAction = confirm(`Tem certeza que deseja ${actionType} a obra ID ${artworkId}?`);
+        if (!confirmAction) return;
+
+        const apiUrl = `/api/artworks/${artworkId}/${actionType}`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || `Falha ao ${actionType} a obra.`);
+            alert(result.message);
+            window.location.reload(); // Recarrega a página para atualizar a lista
+        } catch (err) {
+            alert(`Erro: ${err.message}`);
+        }
+    }
+
+    function approveArtwork(artworkId) {
+        handleArtworkAction(artworkId, 'approve');
+    }
+
+    function rejectArtwork(artworkId) {
+        handleArtworkAction(artworkId, 'reject');
+    }
+
+    // Script de Logout
+    const logoutButton = document.getElementById('logoutButtonEJS');
+    if(logoutButton) {
+        logoutButton.addEventListener('click', async function() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login'; 
+            } catch (error) {
+                alert('Erro ao tentar sair: ' + error.message);
+            }
+        });
+    }
+</script>
+</body>
+</html>

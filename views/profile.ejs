@@ -34,32 +34,9 @@
   </style>
 </head>
 <body>
-    <div class="funcoes-container">
-        <div class="artista-p"><a href="/#artists-section" class="nav-link-style"><p>Artistas</p></a></div> 
-        <% if (user) { %>
-            <div class="upload-p"><a href="/artworks/new" class="nav-link-style"><p>Upload</p></a></div>
-            <div class="favoritos-p"><a href="/favorites" class="nav-link-style"><p>Favoritos</p></a></div>
-        <% } %>
-        <% if (user && user.isAdmin) { %>
-            <div style="margin-left:10px;"><a href="/admin/management" class="nav-link-style"><p>Gerenciamento</p></a></div>
-            <div style="margin-left:10px;"><a href="/dashboard" class="nav-link-style"><p>Dashboard</p></a></div>
-        <% } %>
-        <div class="perfil-container" style="display: flex; align-items: center; margin-left: auto;">
-          <img src="<%= (user && user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
-          <% if (user) { %>
-            <a href="/profile" class="login-link nav-link-style" style="margin-left:5px; margin-right: 5px;"><%= user.name %></a>
-            <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
-          <% } else { %>
-            <a href="/login" class="login-link nav-link-style">Entrar</a>
-          <% } %>
-        </div>
-    </div>
+    <%- include('partials/header'); %>
 
-    <div class="container">
-      <div class="container-titulo">
-        <img src="/img/unnamed.png" alt="Logo" class="logo-class">
-        <p class="titulo">Art Gallery</p>
-      </div>
+   
     </div>
     <div class="categorias-container">
         <p><a href="#" class="nav-link-style">Mais recentes</a></p> </div>

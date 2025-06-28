@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/globals.css" />
     <link rel="stylesheet" href="/css/styleguide.css" />
     <link rel="stylesheet" href="/css/login.css" /> <title><%= pageTitle %></title>
-    <style> 
+    <style> /* Para mensagens de feedback */
         .form-message { text-align: center; margin-top: 15px; font-weight: bold; }
         .form-message.success { color: green; }
         .form-message.error { color: red; }
@@ -15,6 +15,7 @@
   <body>
     <div class="login"> <div class="div"> <img class="image" src="/img/image.png" alt="Background Login" /> 
         <img class="unnamed" src="/img/unnamed.png" alt="Logo Small" />
+        
         <div class="login-form"> <div class="intro">
             <div class="text-wrapper">ART GALLERY</div>
             <p class="p">Onde a arte encontra seu lugar.</p>
@@ -43,29 +44,16 @@
                 </div>
               </div>
             </div>
-            <div class="text-wrapper-2" style="cursor:pointer; text-align: right; width: 100%;" onclick="alert('Funcionalidade Esqueceu Senha não implementada.');">Esqueceu sua senha?</div>
+            <a href="/request-password-reset" class="text-wrapper-2" style="cursor:pointer; text-align: right; width: 100%;">Esqueceu sua senha?</a>
             <button type="submit" class="main-button">
               <div class="sign-in">Entrar</div>
             </button>
           </form>
-          <p id="loginMessageClient" class="form-message"></p> <div class="social-sign-in">
-            <div class="or">
-              <img class="line" src="/img/line-2.svg" alt="Line" />
-              <div class="text-wrapper-3">Ou</div>
-              <img class="line" src="/img/line-1.svg" alt="Line" />
+          <p id="loginMessageClient" class="form-message"></p>
+
+          <div class="social-sign-in" style="margin-top: 20px;">
             </div>
-          </div>
-          <div class="social-buttons">
-            <div class="social-button">
-              <img class="img" src="/img/google.png" alt="Google Icon" />
-              <div class="sign-in-with">Entrar com o Google</div>
-            </div>
-            <div class="social-button">
-              <img class="img" src="/img/facebook.png" alt="Facebook Icon" />
-              <div class="sign-in-with-2">Entrar com o Facebook</div>
-            </div>
-          </div>
-          <p class="voc-n-o-possui-conta">
+          <p class="voc-n-o-possui-conta" style="margin-top: 20px;">
             <span class="span">Você não possui conta? </span> 
             <a href="/register" class="text-wrapper-4">Cadastre-se</a>
           </p>
@@ -77,7 +65,7 @@
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const messageEl = document.getElementById('loginMessageClient');
-            messageEl.textContent = ''; // Limpa mensagens do cliente
+            messageEl.textContent = ''; 
 
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -94,17 +82,33 @@
                 if (!response.ok) {
                     throw new Error(result.error || 'Falha no login. Verifique suas credenciais.');
                 }
-                
-               
+
+                // ---- CORREÇÃO IMPORTANTE AQUI ----
+                // 1. Salvar o token no localStorage para ser usado por scripts em outras páginas.
+                // Usaremos a chave 'userAuthToken' para usuários normais e admins.
+                localStorage.setItem('userAuthToken', result.token);
+
+                // A chave 'adminAuthToken' também é salva se o usuário for admin,
+                // para compatibilidade com outros scripts que possam procurá-la.
                 if (result.user && result.user.isAdmin) {
-                    window.location.href = '/admin/permissions'; 
-                } else {
-                    
-                    window.location.href = '/artworks/new'; 
+                    localStorage.setItem('adminAuthToken', result.token);
                 }
+                // ---- FIM DA CORREÇÃO ----
+                
+                messageEl.className = 'form-message success';
+                messageEl.textContent = result.message + ' Redirecionando...';
+                
+                // O cookie JWT já foi configurado pelo servidor na resposta.
+                // Agora podemos redirecionar com segurança.
+                if (result.user && result.user.isAdmin) {
+                    window.location.href = '/dashboard'; // Redireciona admin para o dashboard
+                } else {
+                    window.location.href = '/'; // Redireciona usuário comum para a galeria
+                }
+
             } catch (error) {
                 console.error('Erro ao fazer login:', error);
-                messageEl.className = 'form-message error'; // Aplica classe de erro
+                messageEl.className = 'form-message error';
                 messageEl.textContent = 'Erro: ' + error.message;
             }
         });

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/styleguide.css">
+  <link rel="stylesheet" href="/css/header.css"> <style>
+    /* Estilos específicos para esta página, garantindo que ela funcione corretamente */
+    .admin-form-page-body {
+        background-color: #F7F8FA; /* Fundo cinza claro */
+        font-family: 'Inter', sans-serif; /* Usando a fonte do seu styleguide */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin: 0;
+    }
+    .form-main-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    .form-wrapper {
+        width: 100%;
+        max-width: 600px;
+        background-color: #FFFFFF;
+        padding: 32px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .form-wrapper h1 {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--primary-text);
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--secondary-text);
+    }
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #E5E8EB;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1em;
+        font-family: inherit;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background-color: #162d3a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+    }
+    .submit-btn:hover {
+        background-color: #2c3e50;
+    }
+    .form-feedback {
+        text-align: center;
+        margin-top: 15px;
+        font-weight: bold;
+        min-height: 1.2em;
+    }
+    .form-feedback.success { color: green; }
+    .form-feedback.error { color: red; }
+  </style>
+</head>
+<body class="admin-form-page-body">
+  
+
+    <main class="form-main-container">
+        <div class="form-wrapper">
+            <h1><%= pageTitle %></h1>
+
+            <form id="newArtistForm">
+                <div class="form-group">
+                    <label for="name">Nome do Artista (*)</label>
+                    <input type="text" id="name" name="Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="biography">Biografia</label>
+                    <textarea id="biography" name="Biography" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="nationality">Nacionalidade</label>
+                    <input type="text" id="nationality" name="Nationality" placeholder="Ex: Brasileiro(a)">
+                </div>
+                <div class="form-group">
+                    <label for="birthYear">Ano de Nascimento</label>
+                    <input type="number" id="birthYear" name="BirthYear" placeholder="Ex: 1950">
+                </div>
+                <div class="form-group">
+                    <label for="deceasedYear">Ano da Morte (se aplicável)</label>
+                    <input type="number" id="deceasedYear" name="DeceasedYear" placeholder="Ex: 2010">
+                </div>
+                <button type="submit" class="submit-btn">Cadastrar Artista</button>
+            </form>
+            <p id="formFeedbackMessage" class="form-feedback"></p>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('newArtistForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const feedbackEl = document.getElementById('formFeedbackMessage');
+            feedbackEl.textContent = ''; 
+
+            const formData = new FormData(this); // 'this' se refere ao formulário
+            const data = {};
+            formData.forEach((value, key) => {
+                if (value.trim() !== '') {
+                    data[key] = (key === 'BirthYear' || key === 'DeceasedYear') ? parseInt(value, 10) : value;
+                }
+            });
+
+            const token = localStorage.getItem('adminAuthToken'); 
+            if (!token) {
+                feedbackEl.className = 'form-feedback error';
+                feedbackEl.textContent = 'Você precisa estar logado como administrador.';
+                return;
+            }
+
+            try {
+                feedbackEl.className = 'form-feedback';
+                feedbackEl.textContent = 'Cadastrando...';
+
+                const response = await fetch('/api/artists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Falha ao cadastrar o artista.');
+                
+                feedbackEl.className = 'form-feedback success';
+                feedbackEl.textContent = result.message || 'Artista cadastrado com sucesso!';
+                document.getElementById('newArtistForm').reset();
+            } catch (error) {
+                console.error('Erro ao cadastrar artista:', error);
+                feedbackEl.className = 'form-feedback error';
+                feedbackEl.textContent = 'Erro: ' + error.message;
+            }
+        });
+
+        // Script de Logout (incluído para consistência, caso o partial do header não tenha)
+        const logoutBtn = document.getElementById('logoutButtonEJS');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    window.location.href = '/login';
+                } catch (error) {
+                    console.error('Erro ao sair:', error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

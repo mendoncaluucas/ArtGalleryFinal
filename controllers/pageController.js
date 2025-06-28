@@ -501,3 +501,93 @@ exports.renderUserProfilePage = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.renderArtistsListPage = async (req, res, next) => {
+    try {
+        const loggedInUser = getLoggedInUser(req); // Nossa função auxiliar que obtém o usuário do cookie
+
+        // 1. Buscar todos os artistas
+        const [artists] = await db.query('SELECT ArtistID, Name, Biography FROM Artists ORDER BY Name ASC');
+        
+        // 2. Para cada artista, buscar uma imagem de amostra (a primeira obra aprovada, por exemplo)
+        for (const artist of artists) {
+            const [artworksSample] = await db.query(
+                "SELECT ImageURL FROM Artworks WHERE ArtistID = ? AND status = 'approved' AND ImageURL IS NOT NULL AND ImageURL != '' LIMIT 1",
+                [artist.ArtistID]
+            );
+            artist.mainImage = artworksSample.length > 0 ? artworksSample[0].ImageURL : '/img/placeholder-artist.png'; // Use a mesma imagem de placeholder
+        }
+
+        res.render('artists-list', { // Renderiza o novo arquivo views/artists-list.ejs
+            pageTitle: 'Nossos Artistas - Art Gallery',
+            user: loggedInUser,
+            artists: artists, // Passa a lista completa de artistas para o template
+            currentPath: '/artists'
+        });
+
+    } catch (error) {
+        console.error('Erro ao renderizar a lista de artistas:', error);
+        next(error);
+    }
+};
+
+exports.renderDashboardPage = async (req, res, next) => {
+    try {
+        const loggedInUser = getLoggedInUser(req);
+
+        // --- 1. Dados para os Cards ---
+        const [userCountResult] = await db.query("SELECT COUNT(*) as count FROM Users");
+        const [artistCountResult] = await db.query("SELECT COUNT(*) as count FROM Artists");
+        const [artworkCountResult] = await db.query("SELECT COUNT(*) as count FROM Artworks WHERE status = 'approved'");
+        const [pendingArtworkCountResult] = await db.query("SELECT COUNT(*) as count FROM Artworks WHERE status = 'pending_review'");
+        const [newUsersThisPeriodResult] = await db.query("SELECT COUNT(*) as count FROM Users WHERE CreatedAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+        const [newUsersLastPeriodResult] = await db.query("SELECT COUNT(*) as count FROM Users WHERE CreatedAt >= DATE_SUB(NOW(), INTERVAL 60 DAY) AND CreatedAt < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+        
+        const newUsersThisPeriod = newUsersThisPeriodResult[0].count;
+        const newUsersLastPeriod = newUsersLastPeriodResult[0].count;
+        let newUsersTrend = 0;
+        if (newUsersLastPeriod > 0) newUsersTrend = ((newUsersThisPeriod - newUsersLastPeriod) / newUsersLastPeriod) * 100;
+        else if (newUsersThisPeriod > 0) newUsersTrend = 100;
+
+        const stats = {
+            totalUsers: userCountResult[0].count,
+            totalArtists: artistCountResult[0].count,
+            totalArtworks: artworkCountResult[0].count,
+            pendingArtworks: pendingArtworkCountResult[0].count,
+            newUsersCount: newUsersThisPeriod,
+            newUsersTrend: newUsersTrend.toFixed(2)
+        };
+
+        // --- 2. Dados para o Gráfico de Linha ---
+        const [usersLast7Days] = await db.query(`SELECT DATE(CreatedAt) as date, COUNT(UserID) as count FROM Users WHERE CreatedAt >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY DATE(CreatedAt) ORDER BY date ASC`);
+        const lineChartLabels = [];
+        const lineChartData = [];
+        const last7Days = [...Array(7).keys()].map(i => new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)).reverse();
+        last7Days.forEach(day => {
+            lineChartLabels.push(new Date(day).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+            const found = usersLast7Days.find(row => new Date(row.date).toISOString().slice(0, 10) === day);
+            lineChartData.push(found ? found.count : 0);
+        });
+        const lineChart = { labels: lineChartLabels, data: lineChartData };
+
+        // --- 3. Dados para o Gráfico de Rosca ---
+        const [artworkStatusResult] = await db.query("SELECT status, COUNT(*) as count FROM Artworks GROUP BY status");
+        const artworkStatusChart = {
+            labels: artworkStatusResult.map(row => row.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())),
+            data: artworkStatusResult.map(row => row.count)
+        };
+
+        // --- Renderiza a página passando TODOS os dados ---
+        res.render('admin/dashboard', {
+            pageTitle: 'Dashboard - Art Gallery',
+            user: loggedInUser,
+            stats,
+            lineChart,
+            artworkStatusChart,
+            currentPath: '/dashboard'
+        });
+    } catch (error) {
+        console.error('Erro ao renderizar dashboard:', error);
+        next(error);
+    }
+};

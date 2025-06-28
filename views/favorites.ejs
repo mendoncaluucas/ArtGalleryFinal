@@ -33,38 +33,10 @@
   </style>
 </head>
 <body>
-    <div class="funcoes-container">
-        <div class="artista-p">
-            <a href="/#artists-section" class="nav-link-style"><p class="artista-text">Artistas</p></a>
-        </div> 
-        <% if (user && user.isAdmin) { %>
-            <div class="upload-p"><a href="/admin/artworks/validate" class="nav-link-style"><p>Validação</p></a></div>
-            <div class="permissoes-p"><a href="/admin/permissions" class="nav-link-style"><p>Permissões</p></a></div>
-            <div><a href="/admin/artists/new" class="nav-link-style"><p>Cad. Artistas</p></a></div>
-        <% } %>
-        <% if (user) { %>
-            <div class="cadastro_obras-p"><a href="/artworks/new" class="nav-link-style"><p>Cad. Obras</p></a></div>
-            <div class="favoritos-p"><a href="/favorites" class="nav-link-style"><p class="favoritos-text">Favoritos</p></a></div>
-        <% } %>
-        <div class="perfil-container" style="display: flex; align-items: center;">
-          <img src="<%= (user && user.avatarUrl) ? user.avatarUrl : '/img/usuario.png' %>" alt="Perfil" class="fulano-class">
-          <% if (user) { %>
-            <p class="login-link" style="margin-bottom:0; margin-right: 5px;"><%= user.name %></p>
-            <button id="logoutButtonEJS" class="logout-button-style">(Sair)</button>
-          <% } else { %>
-            <a href="/login" class="login-link nav-link-style">Login</a>
-            <a href="/register" class="login-link nav-link-style" style="margin-left:10px;">Registrar</a>
-          <% } %>
-        </div>
-    </div>
+     <%- include('partials/header'); %>
 
-    <div class="container">
-        <div class="container-titulo">
-            <img src="/img/unnamed.png" alt="Logo" class="logo-class">
-            <p class="titulo">Art Gallery</p>
-        </div>
-    </div>
 
+   
     <div class="categorias-container">
         <p><a href="#" class="nav-link-style">Mais recentes</a></p>
         <p><a href="#" class="nav-link-style">Mais vendidos</a></p>

@@ -7,13 +7,17 @@
     <link rel="stylesheet" href="/css/styleguide.css" />
     <link rel="stylesheet" href="/css/cadastro.css" />
     <title><%= pageTitle %></title>
+    <style> /* Estilo para a mensagem de feedback */
+        .form-message { text-align: center; margin-top: 15px; font-weight: bold; }
+        .form-message.success { color: green; }
+        .form-message.error { color: red; }
+    </style>
   </head>
   <body>
     <div class="cadastro">
       <div class="div">
         <img class="image" src="/img/image1.png" alt="Background Image" />
         <img class="unnamed" src="/img/unnamed.png" alt="Logo Small" />
-        <img class="adobecolor-my-color" src="/img/adobecolor-my-color-theme-1.png" alt="Color Theme Artifact" />
         <div class="overlap">
           <form id="registerForm" class="login-form">
             <div class="intro">
@@ -22,34 +26,34 @@
             </div>
             <div class="form">
               <div class="input">
-                <div class="label-2">Email</div>
+                <label for="registerEmail" class="label-2">Email</label>
                 <div class="overlap-group-wrapper">
                   <div class="overlap-group">
-                    <input class="placeholder" name="Email" placeholder="Email@gmail.com" type="email" required />
+                    <input id="registerEmail" class="placeholder" name="Email" placeholder="Email@gmail.com" type="email" required />
                   </div>
                 </div>
               </div>
               <div class="input-2">
-                <div class="label-2">Senha</div>
+                <label for="registerPassword" class="label-2">Senha</label>
                 <div class="overlap-group-wrapper">
                   <div class="overlap-group"> 
-                    <input class="placeholder" name="Password" placeholder="No mínimo 8 caracteres" type="password" required />
+                    <input id="registerPassword" class="placeholder" name="Password" placeholder="No mínimo 8 caracteres" type="password" required />
                   </div>
                 </div>
               </div>
               <div class="input-2">
-                <div class="label-2">Confirme senha</div>
+                <label for="confirmPassword" class="label-2">Confirme senha</label>
                 <div class="overlap-group-wrapper">
                   <div class="overlap-group">
-                    <input class="placeholder" name="ConfirmPassword" placeholder="Confirme senha" type="password" required />
+                    <input id="confirmPassword" class="placeholder" name="ConfirmPassword" placeholder="Confirme a senha" type="password" required />
                   </div>
                 </div>
               </div>
               <div class="input-2">
-                <div class="label-2">Nome</div>
+                <label for="registerName" class="label-2">Nome</label>
                 <div class="overlap-group-wrapper">
                   <div class="overlap-group">
-                   <input class="placeholder" name="Name" placeholder="Digite um Nome" type="text" required />
+                   <input id="registerName" class="placeholder" name="Name" placeholder="Digite seu nome" type="text" required />
                   </div>
                 </div>
               </div>
@@ -57,10 +61,12 @@
                 <div class="sign-in">Criar Conta</div>
               </button>
               <p class="para-criar-uma-conta">
-                <span class="span">Para criar uma conta, é necessário aceitar os </span>
+                <span class="span">Ao criar uma conta, você aceita os </span>
                 <span class="text-wrapper-2">Termos e Condições.</span>
               </p>
             </div>
+            <p id="registerMessage" class="form-message"></p>
+
             <div class="social-sign-in">
               <div class="or">
                 <img class="line" src="/img/line-2.svg" alt="Line" />
@@ -81,36 +87,32 @@
           </form>
           <p class="voc-j-possui-conta">
             <span class="text-wrapper-4">Você já possui conta? </span> 
-            <a href="/login" class="text-wrapper-5">Faça login</a> </p>
+            <a href="/login" class="text-wrapper-5">Faça login</a>
+          </p>
         </div>
       </div>
     </div>
 
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const messageEl = document.getElementById('registerMessage') || document.createElement('p'); // Cria se não existir
-            if (!document.getElementById('registerMessage')) {
-                messageEl.id = 'registerMessage';
-                messageEl.style.textAlign = 'center';
-                messageEl.style.marginTop = '15px';
-                this.parentNode.insertBefore(messageEl, this.nextSibling); // Insere após o form
-            }
-            messageEl.textContent = '';
+            event.preventDefault(); // Impede o envio padrão do formulário
+            const messageEl = document.getElementById('registerMessage');
+            messageEl.textContent = ''; // Limpa mensagens anteriores
 
-            const name = event.target.Name.value;
-            const email = event.target.Email.value;
-            const password = event.target.Password.value;
-            const confirmPassword = event.target.ConfirmPassword.value;
+            // Pega os valores dos inputs usando seus IDs
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
+            // Validações no frontend
             if (password !== confirmPassword) {
-                messageEl.style.color = 'red';
+                messageEl.className = 'form-message error';
                 messageEl.textContent = 'As senhas não coincidem!';
                 return;
             }
-
-            if (password.length < 6) { // Adicionando validação de tamanho da senha que temos no backend
-                messageEl.style.color = 'red';
+            if (password.length < 6) {
+                messageEl.className = 'form-message error';
                 messageEl.textContent = 'A senha deve ter pelo menos 6 caracteres.';
                 return;
             }
@@ -123,21 +125,31 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+
                 const result = await response.json();
+
                 if (!response.ok) {
                     throw new Error(result.error || 'Falha ao registrar.');
                 }
-                messageEl.style.color = 'green';
-                messageEl.textContent = result.message + ' Você será redirecionado para o login...';
+                
+                // Se o registro for bem-sucedido, o backend já setou o cookie de login.
+                // Agora, salvamos o token recebido no localStorage para uso em chamadas AJAX futuras.
+                localStorage.setItem('userAuthToken', result.token);
+                
+                messageEl.className = 'form-message success';
+                messageEl.textContent = result.message + ' Login automático... Redirecionando para a página inicial.';
+                
+                // Redireciona para a página inicial após um breve delay
                 setTimeout(() => {
-                    window.location.href = '/login'; 
-                }, 2500);
+                    window.location.href = '/'; // Redireciona para a homepage da galeria
+                }, 2000);
+
             } catch (error) {
                 console.error('Erro ao registrar:', error);
-                messageEl.style.color = 'red';
+                messageEl.className = 'form-message error';
                 messageEl.textContent = 'Erro: ' + error.message;
             }
         });
-
-      
-        const loginLinkElement = document.querySelector
+    </script>
+  </body>
+</html>

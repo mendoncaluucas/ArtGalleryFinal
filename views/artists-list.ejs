@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/styleguide.css">
+  <link rel="stylesheet" href="/css/homepage.css">
+  <style>
+    /* Estilos para a lista de artistas. Mova para um arquivo .css se preferir. */
+    .artists-grid-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 20px;
+        max-width: 1400px;
+        margin: 20px auto;
+    }
+    .artist-card {
+        width: 280px;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        background-color: #fff;
+        text-align: center;
+        overflow: hidden; /* Para garantir que a imagem não saia do card arredondado */
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .artist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+    .artist-card a {
+        text-decoration: none;
+        color: inherit;
+    }
+    .artist-card-image {
+        width: 100%;
+        height: 250px; /* Altura fixa para a imagem do artista */
+        object-fit: cover;
+    }
+    .artist-card-name {
+        font-weight: bold;
+        font-size: 1.1em;
+        padding: 15px;
+        margin: 0;
+    }
+    .logout-button-style { background: none; border: none; color: inherit; cursor: pointer; padding: 0; margin-left: 10px; font-size: inherit; font-family: inherit; }
+    .nav-link-style { color: inherit; text-decoration: none; }
+    .nav-link-style p { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+   <%- include('partials/header'); %>
+    </div>
+   
+
+    <div style="text-align:center; margin: 30px 0;">
+        <h1>Nossos Artistas</h1>
+    </div>
+
+    <div class="artists-grid-container">
+        <% if (artists && artists.length > 0) { %>
+            <% artists.forEach(artist => { %>
+                <div class="artist-card">
+                    <a href="/artists/<%= artist.ArtistID %>/details">
+                        <img class="artist-card-image" src="<%= artist.mainImage || '/img/placeholder-artist.png' %>" alt="Foto de <%= artist.Name %>">
+                        <p class="artist-card-name"><%= artist.Name %></p>
+                    </a>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>Nenhum artista encontrado no momento.</p>
+        <% } %>
+    </div>
+
+    <footer>
+        </footer>
+
+    <% if (user) { %>
+    <script>
+        const logoutBtnArtists = document.getElementById('logoutButtonEJS');
+        if(logoutBtnArtists) {
+            logoutBtnArtists.addEventListener('click', async function() {
+                try {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    window.location.href = '/login'; 
+                } catch (error) {
+                    alert('Erro ao tentar sair: ' + error.message);
+                }
+            });
+        }
+    </script>
+    <% } %>
+</body>
+</html>
