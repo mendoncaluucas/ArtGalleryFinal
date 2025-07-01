@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 31/05/2025 às 21:32
+-- Tempo de geração: 01/07/2025 às 19:53
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -59,7 +59,8 @@ CREATE TABLE `artists` (
 INSERT INTO `artists` (`ArtistID`, `Name`, `Biography`, `Nationality`, `BirthYear`, `DeceasedYear`, `CreatedAt`, `UpdatedAt`) VALUES
 (1, 'Leonardo da Vinci', 'Leonardo di ser Piero da Vinci foi um polímata italiano do Renascimento, cujas áreas de interesse incluíam invenção, desenho, pintura, escultura, arquitetura, ciência, música, matemática, engenharia, literatura, anatomia, geologia, astronomia, botânica, paleontologia e cartografia.', 'Italiano', 1452, 1519, '2025-05-30 02:01:40', '2025-05-30 02:01:40'),
 (2, 'Claude Monet', 'Pioneiro do Impressionismo francês.', 'Francês', 1840, 1926, '2025-05-30 02:01:53', '2025-05-30 02:01:53'),
-(3, 'Frida Kahlo', 'Pintora mexicana conhecida por seus autorretratos intensos e coloridos.', 'Mexicana', 1907, 1954, '2025-05-30 02:01:59', '2025-05-30 02:01:59');
+(3, 'Frida Kahlo', 'Pintora mexicana conhecida por seus autorretratos intensos e coloridos.', 'Mexicana', 1907, 1954, '2025-05-30 02:01:59', '2025-05-30 02:01:59'),
+(4, 'jorge', 'teste teste teste', 'Americano', 2005, NULL, '2025-06-28 01:39:36', '2025-06-28 01:39:36');
 
 -- --------------------------------------------------------
 
@@ -86,7 +87,9 @@ CREATE TABLE `artworks` (
 --
 
 INSERT INTO `artworks` (`ArtworkID`, `Title`, `Description`, `CreationYear`, `Medium`, `Dimensions`, `ImageURL`, `ArtistID`, `CreatedAt`, `UpdatedAt`, `status`) VALUES
-(1, 'A Noite Estrelada', 'Vista da janela do quarto do sanatório.', 1889, 'Óleo sobre tela', '73.7 cm × 92.1 cm', 'caminho/para/imagem.jpg', 1, '2025-05-30 02:05:42', '2025-05-30 02:05:42', 'pending_review');
+(1, 'A Noite Estrelada', 'Vista da janela do quarto do sanatório.', 1889, 'Óleo sobre tela', '73.7 cm × 92.1 cm', 'caminho/para/imagem.jpg', 1, '2025-05-30 02:05:42', '2025-06-27 17:21:49', 'rejected'),
+(2, 'Teste', 'Obra de teste', 1472, 'Óleo sobre tela ', '73cm x 82cm', '/uploads/artworks/artworkImage-1750967732062-231833797.png', 1, '2025-06-26 19:55:32', '2025-06-27 17:21:41', 'approved'),
+(3, 'Obra de teste', 'Uma obra apenas para testar as funcionalidades', 2025, 'Código em massa', '7cm x 8cm', '/uploads/artworks/artworkImage-1751071653720-543049170.png', 2, '2025-06-28 00:47:33', '2025-06-28 00:47:33', 'pending_review');
 
 -- --------------------------------------------------------
 
@@ -141,7 +144,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`UserID`, `Name`, `Email`, `Password`, `IsAdmin`, `CreatedAt`, `UpdatedAt`, `resetPasswordToken`, `resetPasswordExpires`) VALUES
 (1, 'Lucas Teste', 'lucas.teste@example.com', '$2b$10$zsd/h.PiYwiet7zaJ90AOuwfn9Z1K3A1sXvdRh7zdQKGuFcYvpI/e', 1, '2025-05-30 01:16:13', '2025-05-30 01:37:56', NULL, NULL),
-(2, 'Maria Silva', 'maria.silva@example.com', '$2b$10$G4e4k7ziKc5NIve/QGmKPuOzMS88TXEIQH/dOZ.gkPij8jH2g4BGO', 0, '2025-05-30 17:17:14', '2025-05-30 17:17:14', NULL, NULL);
+(2, 'Maria Silva', 'maria.silva@example.com', '$2b$10$G4e4k7ziKc5NIve/QGmKPuOzMS88TXEIQH/dOZ.gkPij8jH2g4BGO', 0, '2025-05-30 17:17:14', '2025-05-30 17:17:14', NULL, NULL),
+(3, 'thiago', 'lucasmendonca660@gmail.com', '$2b$10$4Jpk3XyllpcX9nRIa1au6ucbI6sF/TbQRNWFSvS6yYz/UJd9hHR/i', 0, '2025-06-27 18:33:23', '2025-06-27 18:39:36', NULL, NULL);
 
 --
 -- Índices para tabelas despejadas
@@ -203,13 +207,13 @@ ALTER TABLE `activities`
 -- AUTO_INCREMENT de tabela `artists`
 --
 ALTER TABLE `artists`
-  MODIFY `ArtistID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ArtistID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de tabela `artworks`
 --
 ALTER TABLE `artworks`
-  MODIFY `ArtworkID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ArtworkID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `notifications`
@@ -227,7 +231,7 @@ ALTER TABLE `userfavorites`
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restrições para tabelas despejadas
